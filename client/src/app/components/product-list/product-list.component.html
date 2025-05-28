@@ -1,0 +1,74 @@
+<div class="container">
+
+    <!-- Filter by Brand -->
+    <div class="mb-3">
+      <strong>Filter by Brand: </strong>
+      <button
+        *ngFor="let brand of brands"
+        class="btn btn-outline-primary btn-sm me-2"
+        [class.active]="selectedBrand === brand"
+        (click)="onBrandSelected(brand)">
+        {{ brand }}
+      </button>
+    </div>
+  
+    <!-- Filter by Type -->
+    <div class="mb-3">
+      <strong>Filter by Type: </strong>
+      <button
+        *ngFor="let type of types"
+        class="btn btn-outline-secondary btn-sm me-2"
+        [class.active]="selectedType === type"
+        (click)="onTypeSelected(type)">
+        {{ type }}
+      </button>
+    </div>
+
+    <div class="mb-4">
+        <strong>Sort by:</strong>
+        <select class="form-select w-auto d-inline-block ms-2" [(ngModel)]="sort" (change)="loadProducts()">
+          <option *ngFor="let option of sortOptions" [value]="option.value">
+            {{ option.name }}
+          </option>
+        </select>
+      </div>
+  
+<!-- Product Grid -->
+<div class="row">
+  <div class="col-md-4 mb-4" *ngFor="let product of products">
+    <div class="card h-100" [routerLink]="['/product', product.id]" style="cursor: pointer;">
+      <img
+        [src]="getImageUrl(product.pictureUrl)"
+        alt="{{ product.name }}"
+        class="card-img-top img-fluid"
+        style="max-height: 200px; object-fit: contain;"
+      />
+      <div class="card-body">
+        <h5 class="card-title">{{ product.name }}</h5>
+        <p class="card-text">{{ product.description }}</p>
+        <p><strong>{{ product.price | currency }}</strong></p>
+        <p>{{ product.brand }} | {{ product.type }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <nav *ngIf="pagination">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="pagination.pageIndex === 1">
+            <a class="page-link" (click)="onPageChanged(pagination.pageIndex - 1)">Previous</a>
+          </li>
+      
+          <li class="page-item"
+              *ngFor="let page of [].constructor(pagination.totalPages); let i = index"
+              [class.active]="pagination.pageIndex === i + 1">
+            <a class="page-link" (click)="onPageChanged(i + 1)">{{ i + 1 }}</a>
+          </li>
+      
+          <li class="page-item" [class.disabled]="pagination.pageIndex === pagination.totalPages">
+            <a class="page-link" (click)="onPageChanged(pagination.pageIndex + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+  
+  </div>
