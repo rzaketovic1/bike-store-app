@@ -1,0 +1,29 @@
+<div class="container py-5" *ngIf="product">
+    <div class="row">
+      <!-- Slika proizvoda -->
+      <div class="col-md-6 text-center mb-4">
+        <img [src]="getImageUrl(product.pictureUrl)" alt="product image" class="img-fluid rounded shadow" style="max-height: 400px; object-fit: contain;">
+      </div>
+  
+      <!-- Detalji proizvoda -->
+      <div class="col-md-6">
+        <h2 class="mb-3">{{ product.name }}</h2>
+        <h4 class="text-primary mb-3">${{ product.price }}</h4>
+  
+        <p class="mb-4">
+          <strong>Description:</strong><br>
+          {{ product.description }}
+        </p>
+  
+        <ul class="list-group mb-4">
+          <li class="list-group-item"><strong>Brand:</strong> {{ product.brand }}</li>
+          <li class="list-group-item"><strong>Type:</strong> {{ product.type }}</li>
+          <li class="list-group-item"><strong>In Stock:</strong> {{ product.quantityInStock }}</li>
+        </ul>
+  
+        <button class="btn btn-success btn-lg">
+          <i class="bi bi-cart-plus"></i> Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
