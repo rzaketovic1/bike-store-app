@@ -3,6 +3,8 @@ import { Pagination } from 'src/app/models/pagination';
 import { Product } from 'src/app/models/product';
 import { ProductService } from 'src/app/services/product.service';
 
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-product-list',
   templateUrl: './product-list.component.html'
@@ -12,7 +14,9 @@ export class ProductListComponent implements OnInit {
   brands: string[] = [];
   types: string[] = [];
   sort: string = '';
+  
 
+  selectedFile: File | null = null;
   selectedBrand: string = 'All';
   selectedType: string = 'All';
 
@@ -26,6 +30,19 @@ export class ProductListComponent implements OnInit {
     { name: 'Price: Low to High', value: 'priceAsc' },
     { name: 'Price: High to Low', value: 'priceDesc' }
   ];
+
+  newProduct = {
+  name: '',
+  description: '',
+  price: 0,
+  pictureUrl: '',
+  brand: '',
+  type: '',
+  quantityInStock: 0
+  };
+
+  showForm = false; // inicijalno skrivena forma
+  
 
   constructor(private productService: ProductService) {}
 
@@ -60,9 +77,12 @@ export class ProductListComponent implements OnInit {
     const type = this.selectedType === 'All' ? undefined : this.selectedType;
 
     this.productService.getProducts(brand, type, this.sort).subscribe({
-      next: res => {this.products = res; console.log(res)},
-      error: err => console.error(err)
-    });
+  next: res => {
+    this.products = res;
+    console.table(this.products); // pregledno, uključujući pictureUrl
+  },
+  error: err => console.error(err)
+});
   }
 
   loadBrands(): void {
@@ -90,8 +110,8 @@ export class ProductListComponent implements OnInit {
   }
 
   getImageUrl(pictureUrl: string): string {
-    return 'assets/images/products/' + pictureUrl;
-  }
+  return 'http://localhost:5000' + pictureUrl; // ili 5001 ako koristiš HTTPS
+}
 
   onPageChanged(page: number): void {
     if (page !== this.pagination.pageIndex) {
@@ -99,4 +119,55 @@ export class ProductListComponent implements OnInit {
       this.loadProducts();
     }
   }
+
+  onFileSelected(event: any) {
+  const file: File = event.target.files[0];
+  if (file) {
+    this.selectedFile = file;
+  }
+}
+
+  onSubmit() {
+  if (!this.selectedFile) {
+    alert("Please select an image.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', this.selectedFile);
+  formData.append('name', this.newProduct.name);
+  formData.append('description', this.newProduct.description);
+  formData.append('price', this.newProduct.price.toString());
+  formData.append('brand', this.newProduct.brand);
+  formData.append('type', this.newProduct.type);
+  formData.append('quantityInStock', this.newProduct.quantityInStock.toString());
+
+  this.productService.uploadProductWithImage(formData).subscribe({
+    next: (res) => {
+      alert('Product created!');
+      this.resetForm();
+      this.loadProducts();
+
+      // zatvori modal
+      const modalEl = document.getElementById('createProductModal');
+      if (modalEl) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+      }
+    },
+    error: () => alert('Error creating product')
+  });
+  }
+
+  resetForm() {
+  this.newProduct = {
+    name: '',
+    description: '',
+    price: 0,
+    pictureUrl: '',
+    brand: '',
+    type: '',
+    quantityInStock: 0
+  };
+}
 }

@@ -1,29 +1,98 @@
 <div class="container py-5" *ngIf="product">
-    <div class="row">
-      <!-- Slika proizvoda -->
-      <div class="col-md-6 text-center mb-4">
-        <img [src]="getImageUrl(product.pictureUrl)" alt="product image" class="img-fluid rounded shadow" style="max-height: 400px; object-fit: contain;">
+  <div class="row">
+    <!-- Slika proizvoda -->
+    <div class="col-md-6 text-center mb-4">
+      <img
+        [src]="getImageUrl(product!.pictureUrl)"
+        alt="product image"
+        class="img-fluid rounded shadow"
+        style="max-height: 400px; object-fit: contain;"
+      />
+    </div>
+
+    <!-- Detalji proizvoda -->
+    <div class="col-md-6">
+      <h2 class="mb-3">{{ product!.name }}</h2>
+      <h4 class="text-primary mb-3">${{ product!.price }}</h4>
+
+      <p class="mb-4">
+        <strong>Description:</strong><br />
+        {{ product!.description }}
+      </p>
+
+      <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Brand:</strong> {{ product!.brand }}</li>
+        <li class="list-group-item"><strong>Type:</strong> {{ product!.type }}</li>
+        <li class="list-group-item"><strong>In Stock:</strong> {{ product!.quantityInStock }}</li>
+      </ul>
+
+      <!-- Dugme za Edit -->
+      <button class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#editProductModal">
+        Edit
+      </button>
+      <button class="btn btn-outline-danger ms-2" (click)="deleteProduct()">
+      Delete
+    </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal za edit -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-  
-      <!-- Detalji proizvoda -->
-      <div class="col-md-6">
-        <h2 class="mb-3">{{ product.name }}</h2>
-        <h4 class="text-primary mb-3">${{ product.price }}</h4>
-  
-        <p class="mb-4">
-          <strong>Description:</strong><br>
-          {{ product.description }}
-        </p>
-  
-        <ul class="list-group mb-4">
-          <li class="list-group-item"><strong>Brand:</strong> {{ product.brand }}</li>
-          <li class="list-group-item"><strong>Type:</strong> {{ product.type }}</li>
-          <li class="list-group-item"><strong>In Stock:</strong> {{ product.quantityInStock }}</li>
-        </ul>
-  
-        <button class="btn btn-success btn-lg">
-          <i class="bi bi-cart-plus"></i> Add to Cart
-        </button>
+
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="name">Name</label>
+            <input [(ngModel)]="product!.name" name="name" id="name" class="form-control" />
+          </div>
+
+          <div class="mb-3">
+            <label for="description">Description</label>
+            <textarea [(ngModel)]="product!.description" name="description" id="description" class="form-control"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="price">Price</label>
+            <input type="number" [(ngModel)]="product!.price" name="price" id="price" class="form-control" />
+          </div>
+
+                  <div class="mb-3">
+            <label for="brand">Brand</label>
+            <select [(ngModel)]="product!.brand" name="brand" id="brand" class="form-select">
+              <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="type">Type</label>
+            <select [(ngModel)]="product!.type" name="type" id="type" class="form-select">
+              <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="quantity">Quantity In Stock</label>
+            <input type="number" [(ngModel)]="product!.quantityInStock" name="quantity" id="quantity" class="form-control" />
+          </div>
+
+          <div class="mb-3">
+            <label for="image">Change Image (optional)</label>
+            <input type="file" (change)="onFileSelected($event)" id="image" class="form-control" accept="image/*" />
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" (click)="saveChanges()" data-bs-dismiss="modal">Save Changes</button>
       </div>
     </div>
   </div>
+</div>

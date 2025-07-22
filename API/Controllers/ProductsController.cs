@@ -1,5 +1,6 @@
 ﻿using Core.Dtos;
 using Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -41,12 +42,30 @@ public class ProductsController(IProductService service) : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = created.Id }, created);
     }
 
+    [HttpPost("with-image")]
+    public async Task<ActionResult<ProductDto>> CreateProductWithImage([FromForm] ProductWithImageDto dto)
+    {
+        var created = await service.CreateProductWithImageAsync(dto);
+        return CreatedAtAction(nameof(GetProduct), new { id = created.Id }, created);
+    }
+
     [HttpPut("{id:int}")]
     public async Task<ActionResult> UpdateProduct(int id, ProductDto dto)
     {
         var updated = await service.UpdateProduct(id, dto);
         if (!updated) return BadRequest("Cannot update this product");
         return NoContent();
+    }
+
+    [HttpPut("{id}/with-image")]
+    public async Task<ActionResult<ProductDto>> UpdateProductWithImage(int id, [FromForm] ProductWithImageDto dto)
+    {
+        if (id != dto.Id) return BadRequest("ID mismatch");
+
+        var updated = await service.UpdateProductWithImageAsync(dto);
+        if (updated == null) return NotFound();
+
+        return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]

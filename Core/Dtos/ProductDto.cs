@@ -29,7 +29,7 @@ public class ProductDto
         Name = product.Name;
         Description = product.Description;
         Price = product.Price;
-        PictureUrl = product.PictureUrl;
+        PictureUrl = "/images/products/" + product.PictureUrl;
         Type = product.Type;
         Brand = product.Brand;
         QuantityInStock = product.QuantityInStock;

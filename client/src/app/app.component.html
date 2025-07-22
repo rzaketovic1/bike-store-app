@@ -1,1 +1,28 @@
-<router-outlet></router-outlet>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">Bike Store</a>
+
+    <div class="d-flex ms-auto align-items-center">
+      <ng-container *ngIf="authService.isLoggedIn(); else loggedOut">
+        <!-- Dugmad sada izgledaju kao solid dugmad -->
+        <button class="btn btn-light btn-sm mx-1" (click)="onPost()">POST</button>
+        <button class="btn btn-light btn-sm mx-1" (click)="onPut()">PUT</button>
+        <button class="btn btn-light btn-sm mx-1" (click)="onDelete()">DELETE</button>
+        <span class="mx-3 text-white fw-bold">
+          Welcome, {{ userDisplayName }}
+        </span>
+        <a (click)="logout()" class="btn btn-danger btn-sm ms-2">Logout</a>
+      </ng-container>
+
+      <ng-template #loggedOut>
+        <a routerLink="/login" class="btn btn-sm btn-outline-light me-2">Login</a>
+        <a routerLink="/register" class="btn btn-sm btn-outline-light">Register</a>
+      </ng-template>
+    </div>
+  </div>
+</nav>
+
+<!-- Glavni sadržaj -->
+<div class="container mt-4">
+  <router-outlet></router-outlet>
+</div>

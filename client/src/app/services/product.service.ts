@@ -22,6 +22,19 @@ export class ProductService {
     return this.http.get<Product[]>(this.baseUrl + 'products/all', { params });
   }
 
+  createProduct(product: any): Observable<any> {
+    console.log(product);
+    return this.http.post<any>(this.baseUrl + 'products', product);
+  }
+
+updateProduct(id: number, formData: FormData): Observable<Product> {
+  return this.http.put<Product>(`http://localhost:5000/api/products/${id}/with-image`, formData);
+}
+
+deleteProduct(id: number): Observable<void> {
+  return this.http.delete<void>(`http://localhost:5000/api/products/${id}`);
+}
+
   getPaginatedProducts(
     brand?: string,
     type?: string,
@@ -50,6 +63,10 @@ export class ProductService {
 
   getProduct(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.baseUrl}products/${id}`);
+  }
+
+  uploadProductWithImage(data: FormData): Observable<any> {
+  return this.http.post('https://localhost:5001/api/products/with-image', data);
   }
 
 }

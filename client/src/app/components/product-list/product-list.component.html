@@ -1,5 +1,75 @@
 <div class="container">
 
+  <button class="btn btn-outline-dark mb-3" data-bs-toggle="modal" data-bs-target="#createProductModal">
+  POST
+  </button>
+
+    <!-- Modal -->
+  <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="createProductModalLabel">Create New Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" #productForm="ngForm">
+          <div class="modal-body">
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" [(ngModel)]="newProduct.name" name="name" id="name" class="form-control" placeholder="Enter product name" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea [(ngModel)]="newProduct.description" name="description" id="description" class="form-control" placeholder="Enter description" rows="3" required></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="price" class="form-label">Price</label>
+              <input type="number" [(ngModel)]="newProduct.price" name="price" id="price" class="form-control" placeholder="Enter price" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="image" class="form-label">Select Image</label>
+              <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
+            </div>
+
+            <div class="mb-3">
+              <label for="brand" class="form-label">Brand</label>
+              <select [(ngModel)]="newProduct.brand" name="brand" id="brand" class="form-select" required>
+                <option value="" disabled selected>Choose brand</option>
+                <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="type" class="form-label">Type</label>
+              <select [(ngModel)]="newProduct.type" name="type" id="type" class="form-select" required>
+                <option value="" disabled selected>Choose type</option>
+                <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="quantityInStock" class="form-label">Quantity In Stock</label>
+              <input type="number" [(ngModel)]="newProduct.quantityInStock" name="quantityInStock" id="quantityInStock" class="form-control" placeholder="Enter quantity" required>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
     <!-- Filter by Brand -->
     <div class="mb-3">
       <strong>Filter by Brand: </strong>
