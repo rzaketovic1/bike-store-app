@@ -16,6 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 	<PropertyGroup>
@@ -23,5 +24,11 @@
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<!-- sakriva warninge za nedokumentovane članove -->
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="store.db">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>
