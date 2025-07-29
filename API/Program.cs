@@ -1,41 +1,41 @@
-using Core.Interfaces;
+﻿using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
+// Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-// Add services to the container.
-
+// Add services
 builder.Services.AddControllers();
-builder.Services.AddDbContext<StoreContext>(opt =>
-{
-    //opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddDbContext<StoreContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-});
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+
 builder.Services.AddEndpointsApiExplorer();
 
+// Swagger + JWT Auth
 builder.Services.AddSwaggerGen(c =>
 {
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
 
-    // Dodaj JWT Bearer definiciju
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
@@ -61,6 +61,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// CORS
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("CorsPolicy", policy =>
@@ -71,6 +72,7 @@ builder.Services.AddCors(opt =>
     });
 });
 
+// JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -87,32 +89,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseCors("CorsPolicy");
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseStaticFiles();
-
-app.MapControllers();
-
+//Apply migrations and seed
 try
 {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
+
     var context = services.GetRequiredService<StoreContext>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
     await context.Database.MigrateAsync();
     await StoreContextSeed.SeedAsync(context);
 }
 catch (Exception ex)
 {
-    Console.WriteLine(ex);
+    Console.WriteLine("Migration/Seeding failed: " + ex.Message);
     throw;
 }
 
-app.Run();
+// Middleware
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseStaticFiles();
+app.MapControllers();
+
+// ✅ async run
+await app.RunAsync();

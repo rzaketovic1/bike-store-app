@@ -9,7 +9,7 @@ import { PaginatedResult } from '../models/paginatedResults';
   providedIn: 'root'
 })
 export class ProductService {
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = 'http://localhost:5000/api/';
 
   constructor(private http: HttpClient) {}
 
@@ -66,7 +66,7 @@ deleteProduct(id: number): Observable<void> {
   }
 
   uploadProductWithImage(data: FormData): Observable<any> {
-  return this.http.post('https://localhost:5001/api/products/with-image', data);
+  return this.http.post('http://localhost:5000/api/products/with-image', data);
   }
 
 }

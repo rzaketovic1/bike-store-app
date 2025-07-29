@@ -9,7 +9,8 @@ public class StoreContextSeed
     {
         if (!context.Products.Any())
         {
-            var productsData = await File.ReadAllTextAsync("../Infrastructure/Data/SeedData/products.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "products.json");
+            var productsData = await File.ReadAllTextAsync(path);
             var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
             if (products == null) return;
@@ -20,7 +21,8 @@ public class StoreContextSeed
         else
         {
             // UPDATE: Refresh PictureUrls ako su već u bazi
-            var productsData = await File.ReadAllTextAsync("../Infrastructure/Data/SeedData/products.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "products.json");
+            var productsData = await File.ReadAllTextAsync(path);
             var updatedProducts = JsonSerializer.Deserialize<List<Product>>(productsData);
 
             if (updatedProducts == null) return;

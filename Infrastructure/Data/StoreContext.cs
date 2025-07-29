@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
-public class StoreContext(DbContextOptions options) : DbContext(options)
+public class StoreContext(DbContextOptions<StoreContext> options) : DbContext(options)
 {
     public DbSet<Product> Products { get; set; }
     public DbSet<User> Users { get; set; }
@@ -12,7 +12,6 @@ public class StoreContext(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProductConfiguration).Assembly);
     }
 }

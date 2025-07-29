@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'https://localhost:5001/api/Auth'; // koristi svoj API URL
+  private apiUrl = 'http://localhost:5000/api/Auth'; // koristi svoj API URL
   private tokenKey = 'token';
   private userKey = 'user';
 
