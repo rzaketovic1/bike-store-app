@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from 'src/app/models/product';
 import { ProductService } from 'src/app/services/product.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-product-details',
@@ -49,8 +50,21 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   getImageUrl(pictureUrl: string): string {
-    return 'http://localhost:5000' + pictureUrl;
+  if (!pictureUrl) return '';
+
+  // Ako je već pun URL (http/https), vrati ga
+  if (/^https?:\/\//i.test(pictureUrl)) {
+    return pictureUrl;
   }
+
+  // Ukloni "/api" sa kraja apiUrl (ako postoji)
+  const origin = environment.apiUrl.replace(/\/api\/?$/i, '');
+
+  // Dodaj / ispred pictureUrl ako ga nema
+  const path = pictureUrl.startsWith('/') ? pictureUrl : `/${pictureUrl}`;
+
+  return `${origin}${path}`;
+}
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Pagination } from 'src/app/models/pagination';
 import { Product } from 'src/app/models/product';
 import { ProductService } from 'src/app/services/product.service';
+import { environment } from '../../../environments/environment';
 
 declare var bootstrap: any;
 
@@ -110,7 +111,20 @@ export class ProductListComponent implements OnInit {
   }
 
   getImageUrl(pictureUrl: string): string {
-  return 'http://localhost:5000' + pictureUrl; // ili 5001 ako koristiš HTTPS
+  if (!pictureUrl) return '';
+
+  // Ako je već pun URL (http/https), vrati ga
+  if (/^https?:\/\//i.test(pictureUrl)) {
+    return pictureUrl;
+  }
+
+  // Ukloni "/api" sa kraja apiUrl (ako postoji)
+  const origin = environment.apiUrl.replace(/\/api\/?$/i, '');
+
+  // Dodaj / ispred pictureUrl ako ga nema
+  const path = pictureUrl.startsWith('/') ? pictureUrl : `/${pictureUrl}`;
+
+  return `${origin}${path}`;
 }
 
   onPageChanged(page: number): void {
