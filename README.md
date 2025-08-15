@@ -29,4 +29,7 @@ This project demonstrates modern web application development using:
 | Testing    | Playwright (E2E), SpecFlow (API)     |
 | Tools      | Swagger, Postman, GitHub, Docker     |
 
+Run command: docker-compose -f docker-compose-dev.yml up --build
+
+
 ---
