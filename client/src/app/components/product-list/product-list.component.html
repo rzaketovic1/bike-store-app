@@ -1,7 +1,12 @@
 <div class="container">
 
-  <button class="btn btn-outline-dark mb-3" data-bs-toggle="modal" data-bs-target="#createProductModal">
-  POST
+  <button 
+    class="btn btn-success mb-3 px-4 py-2 fw-bold shadow-sm"
+    data-bs-toggle="modal" 
+    data-bs-target="#createProductModal"
+    title="Add new product"
+  >
+    Add Product
   </button>
 
     <!-- Modal -->
@@ -60,36 +65,54 @@
 
           </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Create</button>
-          </div>
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary fw-semibold px-4" 
+            data-bs-dismiss="modal"
+            title="Cancel and close"
+          >
+            ✖ Close
+          </button>
+
+          <button 
+            type="submit" 
+            class="btn btn-primary fw-bold px-4"
+            title="Create new product"
+          >
+            ✅ Create
+          </button>
+        </div>
         </form>
 
       </div>
     </div>
   </div>
 
-    <!-- Filter by Brand -->
-    <div class="mb-3">
-      <strong>Filter by Brand: </strong>
-      <button
-        *ngFor="let brand of brands"
-        class="btn btn-outline-primary btn-sm me-2"
-        [class.active]="selectedBrand === brand"
-        (click)="onBrandSelected(brand)">
-        {{ brand }}
-      </button>
-    </div>
+  <!-- Filter by Brand -->
+  <div class="mb-3">
+    <strong>Filter by Brand: </strong>
+    <button
+      *ngFor="let brand of brands"
+      class="btn btn-outline-primary btn-sm me-2 fw-semibold"
+      [class.active]="selectedBrand === brand"
+      (click)="onBrandSelected(brand)"
+      [attr.title]="'Filter by ' + brand"
+    >
+      {{ brand }}
+    </button>
+  </div>
   
     <!-- Filter by Type -->
     <div class="mb-3">
       <strong>Filter by Type: </strong>
       <button
         *ngFor="let type of types"
-        class="btn btn-outline-secondary btn-sm me-2"
+        class="btn btn-outline-dark btn-sm me-2 fw-semibold"
         [class.active]="selectedType === type"
-        (click)="onTypeSelected(type)">
+        (click)="onTypeSelected(type)"
+        [attr.title]="'Filter by ' + type"
+      >
         {{ type }}
       </button>
     </div>

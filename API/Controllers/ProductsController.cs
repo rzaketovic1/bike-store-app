@@ -36,12 +36,14 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<ProductDto>> CreateProduct(ProductDto dto)
     {
         var created = await service.CreateProduct(dto);
         return CreatedAtAction(nameof(GetProduct), new { id = created.Id }, created);
     }
 
+    [Authorize]
     [HttpPost("with-image")]
     public async Task<ActionResult<ProductDto>> CreateProductWithImage([FromForm] ProductWithImageDto dto)
     {
@@ -50,6 +52,7 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize]
     public async Task<ActionResult> UpdateProduct(int id, ProductDto dto)
     {
         var updated = await service.UpdateProduct(id, dto);
@@ -58,6 +61,7 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPut("{id}/with-image")]
+    [Authorize]
     public async Task<ActionResult<ProductDto>> UpdateProductWithImage(int id, [FromForm] ProductWithImageDto dto)
     {
         if (id != dto.Id) return BadRequest("ID mismatch");
@@ -69,6 +73,7 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize]
     public async Task<ActionResult> DeleteProduct(int id)
     {
         var deleted = await service.DeleteProduct(id);

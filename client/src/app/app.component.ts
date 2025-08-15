@@ -27,19 +27,4 @@ export class AppComponent implements OnInit {
     this.refreshUserDisplayName();
     this.router.navigateByUrl('/');
   }
-
-  onPost() {
-  // Ovdje implementiraj POST logiku ili navigaciju
-  console.log('POST clicked');
-}
-
-onPut() {
-  // Ovdje implementiraj PUT logiku ili navigaciju
-  console.log('PUT clicked');
-}
-
-onDelete() {
-  // Ovdje implementiraj DELETE logiku ili navigaciju
-  console.log('DELETE clicked');
-}
 }

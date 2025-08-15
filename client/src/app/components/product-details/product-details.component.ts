@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from 'src/app/models/product';
 import { ProductService } from 'src/app/services/product.service';
 import { environment } from '../../../environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-details',
@@ -18,7 +19,8 @@ export class ProductDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -86,32 +88,30 @@ export class ProductDetailsComponent implements OnInit {
     }
 
     this.productService.updateProduct(this.product.id, formData).subscribe({
-      next: () => {
-        alert('Product updated successfully!');
-        this.selectedFile = null;
-
-        // 🔄 Ponovno učitaj proizvod da bi se prikazala nova slika
-        this.loadProduct(this.product!.id);
-      },
-      error: () => {
-        alert('Failed to update product');
-      }
-    });
+  next: () => {
+    this.toastr.success('The product has been successfully updated.');
+    this.selectedFile = null;
+    this.loadProduct(this.product!.id); // 🔄 Učitaj novi prikaz
+  },
+  error: () => {
+    this.toastr.error('Error updating product.');
+  }
+});
   }
 
   deleteProduct(): void {
     if (!this.product) return;
 
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.productService.deleteProduct(this.product.id).subscribe({
-        next: () => {
-          alert('Product deleted successfully!');
-          this.router.navigateByUrl('/'); // redirect na početnu
-        },
-        error: () => {
-          alert('Failed to delete product');
-        }
-      });
+    if (confirm('Are you sure you want to delete the product?')) {
+  this.productService.deleteProduct(this.product.id).subscribe({
+    next: () => {
+      this.toastr.success('The product has been successfully deleted.');
+      this.router.navigateByUrl('/');
+    },
+    error: () => {
+      this.toastr.error('Error deleting product.');
     }
+  });
+  }
   }
 }
