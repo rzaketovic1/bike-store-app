@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ProductService {
-  private baseUrl = `${environment.apiUrl}Products/`; // Backend koristi /api/Products
+  private baseUrl = `${environment.apiUrl}Products/`;
 
   constructor(private http: HttpClient) {}
 
@@ -23,22 +23,18 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.baseUrl}all`, { params });
   }
 
-  // POST: /api/Products
   createProduct(product: any): Observable<any> {
     return this.http.post<any>(this.baseUrl, product);
   }
 
-  // PUT: /api/Products/{id}/with-image
   updateProduct(id: number, formData: FormData): Observable<Product> {
     return this.http.put<Product>(`${this.baseUrl}${id}/with-image`, formData);
   }
 
-  // DELETE: /api/Products/{id}
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}${id}`);
   }
 
-  // GET: /api/Products (paginirano)
   getPaginatedProducts(
     brand?: string,
     type?: string,
@@ -57,22 +53,18 @@ export class ProductService {
     return this.http.get<PaginatedResult<Product[]>>(this.baseUrl, { params });
   }
 
-  // GET: /api/Products/brands
   getBrands(): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}brands`);
   }
 
-  // GET: /api/Products/types
   getTypes(): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}types`);
   }
 
-  // GET: /api/Products/{id}
   getProduct(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.baseUrl}${id}`);
   }
 
-  // POST: /api/Products/with-image
   uploadProductWithImage(data: FormData): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}with-image`, data);
   }

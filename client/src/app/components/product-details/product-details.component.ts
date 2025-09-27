@@ -54,15 +54,12 @@ export class ProductDetailsComponent implements OnInit {
   getImageUrl(pictureUrl: string): string {
   if (!pictureUrl) return '';
 
-  // Ako je već pun URL (http/https), vrati ga
   if (/^https?:\/\//i.test(pictureUrl)) {
     return pictureUrl;
   }
 
-  // Ukloni "/api" sa kraja apiUrl (ako postoji)
   const origin = environment.apiUrl.replace(/\/api\/?$/i, '');
 
-  // Dodaj / ispred pictureUrl ako ga nema
   const path = pictureUrl.startsWith('/') ? pictureUrl : `/${pictureUrl}`;
 
   return `${origin}${path}`;
@@ -91,7 +88,7 @@ export class ProductDetailsComponent implements OnInit {
   next: () => {
     this.toastr.success('The product has been successfully updated.');
     this.selectedFile = null;
-    this.loadProduct(this.product!.id); // 🔄 Učitaj novi prikaz
+    this.loadProduct(this.product!.id);
   },
   error: () => {
     this.toastr.error('Error updating product.');

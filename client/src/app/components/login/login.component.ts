@@ -15,14 +15,14 @@ export class LoginComponent {
     constructor(
     private authService: AuthService, 
     private router: Router, 
-    private appComponent: AppComponent // dodaj ovo
+    private appComponent: AppComponent
   ) {}
 
   onSubmit() {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.authService.saveUser({ displayName: response.displayName, token: response.token });
-        this.appComponent.refreshUserDisplayName(); // OVO JE KLJUČ!
+        this.appComponent.refreshUserDisplayName();
         this.router.navigateByUrl('/');
       },
       error: (err) => {

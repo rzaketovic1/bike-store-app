@@ -42,7 +42,7 @@ export class ProductListComponent implements OnInit {
   quantityInStock: 0
   };
 
-  showForm = false; // inicijalno skrivena forma
+  showForm = false;
   
 
   constructor(private productService: ProductService) {}
@@ -80,7 +80,7 @@ export class ProductListComponent implements OnInit {
     this.productService.getProducts(brand, type, this.sort).subscribe({
   next: res => {
     this.products = res;
-    console.table(this.products); // pregledno, uključujući pictureUrl
+    console.table(this.products); 
   },
   error: err => console.error(err)
 });
@@ -113,15 +113,12 @@ export class ProductListComponent implements OnInit {
   getImageUrl(pictureUrl: string): string {
   if (!pictureUrl) return '';
 
-  // Ako je već pun URL (http/https), vrati ga
   if (/^https?:\/\//i.test(pictureUrl)) {
     return pictureUrl;
   }
 
-  // Ukloni "/api" sa kraja apiUrl (ako postoji)
   const origin = environment.apiUrl.replace(/\/api\/?$/i, '');
 
-  // Dodaj / ispred pictureUrl ako ga nema
   const path = pictureUrl.startsWith('/') ? pictureUrl : `/${pictureUrl}`;
 
   return `${origin}${path}`;
@@ -162,7 +159,6 @@ export class ProductListComponent implements OnInit {
       this.resetForm();
       this.loadProducts();
 
-      // zatvori modal
       const modalEl = document.getElementById('createProductModal');
       if (modalEl) {
         const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
