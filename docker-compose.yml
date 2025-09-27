@@ -24,7 +24,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./API/Dockerfile
     ports:
       - "5000:5000"
     environment:
@@ -40,6 +40,7 @@ services:
   client:
     build:
       context: ./client
+      dockerfile: Dockerfile
     ports:
       - "4200:80"
     depends_on:
