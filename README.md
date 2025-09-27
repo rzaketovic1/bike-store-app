@@ -31,7 +31,7 @@ The application follows N-Tier architecture and clean code best practices:
 - Bootstrap 5 – responsive design and UI components
 - Swagger – interactive API documentation
 
-## 🚀 Technologies
+## Technologies
 - Entity Framework Core 8
 - Angular 17
 - Bootstrap 5
