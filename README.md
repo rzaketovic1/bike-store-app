@@ -1,29 +1,47 @@
 # Bike Store App
 
-**Bike Store App** is a CRUD web application for browsing and managing bicycles. 
-Built with **ASP.NET Core** and **Angular**, the app includes secure user authentication, product CRUD operations, image uploads, and a structured backend N-Tier architecture following clean code principles.  
-The backend is built with **.NET 8 (C#)**, the frontend with **Angular**, and data is stored in **PostgreSQL**.  
-The app is containerized with Docker.
+Bike Store App is a modern CRUD web application for browsing and managing bicycles. The app demonstrates clean code principles and N-Tier architecture, with secure authentication, database integration, and full Docker containerization for the backend, frontend, and database.
 
 
-## 📦 Overview
+## Key Features
 
 This project demonstrates modern web application development using:
 
-- 🔐 **JWT-based authentication** (register/login)
-- 🛒 **Product management** with image uploads (admin only)
-- 📃 **Filtering & listing** of bicycles by brand and type
-- 💾 **SQL Server + EF Core** for persistent storage
-- 🌐 **RESTful API** with data validation and DTOs
-- 📸 **Static file hosting** for product images
+- **Authentication & Authorization** – JWT-based login and registration
+- **Product Management (CRUD)** – add, edit, delete, and view bicycles
+- **Image Uploads** – store and display product images
+- **Filtering & Search** – by brand, type, and other attributes
+- **Admin Features** – restricted CRUD operations for admins only
+- **RESTful API** – data exchange with validated DTOs
+
+## Architecture
+
+The application follows N-Tier architecture and clean code best practices:
+
+- UI (Angular) – user interface with reusable components and Bootstrap styling
+- API Controllers (ASP.NET Core) – handle requests from the frontend
+- Services Layer – business logic and authorization
+- Repository Layer – database access via Entity Framework Core
+- DbContext – database connection and model configuration
+- Migrations – versioning and database updates
+- JWT Authentication – secure user identity management
+- Data Transfer Objects (DTOs) – separation of domain models and API layer
+- HttpClient – API communication
+- Interceptor – automatic JWT token handling
+- Bootstrap 5 – responsive design and UI components
+- Swagger – interactive API documentation
 
 ## 🚀 Technologies
-- [.NET 8](https://dotnet.microsoft.com/) – Web API (C#)
-- [Angular](https://angular.io/) – Frontend
-- [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/) – ORM
-- [PostgreSQL](https://www.postgresql.org/) or [SQLite](https://www.sqlite.org/)
-- [Docker](https://www.docker.com/)
+- Entity Framework Core 8
+- Angular 17
+- Bootstrap 5
+- PostgreSQL
+- Docker
 
+The entire app is containerized for easy deployment:
+- PostgreSQL container – database
+- API container – .NET 8 backend with EF Core
+- Angular container – built and served through Nginx
 
 Run command for build containers:  
 `docker compose up --build`  
