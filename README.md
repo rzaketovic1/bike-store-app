@@ -1,7 +1,7 @@
 # Bike Store App
 
 **Bike Store App** is a CRUD web application for browsing and managing bicycles. 
-Built with **ASP.NET Core** and **Angular**, the app includes secure user authentication, product CRUD operations, image uploads, and a structured backend architecture following clean code principles.  
+Built with **ASP.NET Core** and **Angular**, the app includes secure user authentication, product CRUD operations, image uploads, and a structured backend N-Tier architecture following clean code principles.  
 The backend is built with **.NET 8 (C#)**, the frontend with **Angular**, and data is stored in **PostgreSQL**.  
 The app is containerized with Docker.
 
@@ -16,7 +16,6 @@ This project demonstrates modern web application development using:
 - 💾 **SQL Server + EF Core** for persistent storage
 - 🌐 **RESTful API** with data validation and DTOs
 - 📸 **Static file hosting** for product images
-- 🧪 **Automated testing** with Playwright (E2E) & SpecFlow (.NET API)
 
 ## 🚀 Technologies
 - [.NET 8](https://dotnet.microsoft.com/) – Web API (C#)
@@ -27,7 +26,7 @@ This project demonstrates modern web application development using:
 
 
 Run command for build containers:  
-`docker-compose -f docker-compose-dev.yml up --build`  
+`docker compose up --build`  
 
 Swagger documentation is available at:  
 http://localhost:5000/swagger/index.html  
