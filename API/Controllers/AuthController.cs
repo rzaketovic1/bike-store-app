@@ -13,7 +13,7 @@ namespace API.Controllers
         {
             var existingUser = await userService.GetByEmailAsync(registerDto.Email);
             if (existingUser != null)
-                return BadRequest("Email already in use");
+                throw new KeyNotFoundException("Email already in use");
 
             var user = await userService.CreateAsync(registerDto.Email, registerDto.Password, registerDto.DisplayName);
             var token = tokenService.CreateToken(user);
@@ -31,7 +31,7 @@ namespace API.Controllers
         {
             var user = await userService.AuthenticateAsync(loginDto.Email, loginDto.Password);
             if (user == null)
-                return Unauthorized("Invalid credentials");
+                throw new UnauthorizedAccessException("Invalid credentials");
 
             var token = tokenService.CreateToken(user);
 

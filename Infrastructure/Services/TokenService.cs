@@ -20,18 +20,30 @@ namespace Infrastructure.Services
         public string CreateToken(User user)
         {
             var claims = new[]
-            {
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("displayName", user.DisplayName)
-        };
+{
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Name, user.DisplayName),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
+            };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var jwtSection = _config.GetSection("Jwt");
+
+            var key = jwtSection.GetValue<string>("Key")
+                ?? throw new InvalidOperationException("JWT Key not configured.");
+
+            var issuer = jwtSection.GetValue<string>("Issuer");
+            var audience = jwtSection.GetValue<string>("Audience");
+            var duration = jwtSection.GetValue<int>("DurationInMinutes");
+
+            var creds = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(7),
-                signingCredentials: creds);
+                expires: DateTime.UtcNow.AddMinutes(duration),
+                signingCredentials: creds
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

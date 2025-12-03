@@ -15,7 +15,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.refreshUserDisplayName();
-    console.log('Ime korisnika:', this.userDisplayName);
   }
 
   refreshUserDisplayName() {

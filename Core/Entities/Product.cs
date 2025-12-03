@@ -4,13 +4,13 @@ public class Product : BaseEntity
 {
     public required string Name { get; set; }
     public required string Description { get; set; }
-    public decimal Price { get; set; } // nije required
+    public decimal Price { get; set; }
     public required string PictureUrl { get; set; }
     public required string Type { get; set; }
     public required string Brand { get; set; }
-    public int QuantityInStock { get; set; } // nije required
+    public int QuantityInStock { get; set; }
 
-    // Dodatna polja - bez required
+
     public string? FrameSize { get; set; }
     public string? WheelSize { get; set; }
     public string? Color { get; set; }
