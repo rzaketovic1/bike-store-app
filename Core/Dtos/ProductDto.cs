@@ -34,7 +34,6 @@ public class ProductDto
         Brand = product.Brand;
         QuantityInStock = product.QuantityInStock;
 
-        // Mapiraj i dodatna polja po potrebi:
         // FrameSize = product.FrameSize;
         // WheelSize = product.WheelSize;
         // Color = product.Color;
@@ -56,7 +55,6 @@ public class ProductDto
             Brand = this.Brand,
             QuantityInStock = this.QuantityInStock,
 
-            // Mapiraj i dodatna polja po potrebi:
             // FrameSize = this.FrameSize,
             // WheelSize = this.WheelSize,
             // Color = this.Color,

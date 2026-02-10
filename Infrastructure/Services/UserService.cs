@@ -45,7 +45,6 @@ namespace Infrastructure.Services
 
         private string HashPassword(string password)
         {
-            // Simple SHA256 hash (nije za produkciju, ali OK za demo)
             using var sha256 = System.Security.Cryptography.SHA256.Create();
             var bytes = Encoding.UTF8.GetBytes(password);
             var hash = sha256.ComputeHash(bytes);

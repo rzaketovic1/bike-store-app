@@ -34,6 +34,40 @@ public class ProductService : IProductService
         return new ProductDto(product);
     }
 
+    public async Task<ProductDto> CreateProductWithImageAsync(ProductWithImageDto dto)
+    {
+        if (dto.Image == null || dto.Image.Length == 0)
+            throw new ArgumentException("Image file is required");
+
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products");
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        var fileName = Path.GetFileName(dto.Image.FileName);
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await dto.Image.CopyToAsync(stream);
+        }
+
+        var product = new Product
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            Price = dto.Price,
+            Brand = dto.Brand,
+            Type = dto.Type,
+            QuantityInStock = dto.QuantityInStock,
+            PictureUrl = fileName // only file name
+        };
+
+        _repo.AddProduct(product);
+        await _repo.SaveChangesAsync();
+
+        return new ProductDto(product);
+    }
+
     public async Task<bool> UpdateProduct(int id, ProductDto productDto)
     {
         var existing = await _repo.GetProductByIdAsync(id);
@@ -67,40 +101,6 @@ public class ProductService : IProductService
     public async Task<IReadOnlyList<string>> GetTypesAsync()
     {
         return await _repo.GetTypesAsync();
-    }
-
-    public async Task<ProductDto> CreateProductWithImageAsync(ProductWithImageDto dto)
-    {
-        if (dto.Image == null || dto.Image.Length == 0)
-            throw new ArgumentException("Image file is required");
-
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products");
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
-
-        var fileName = Path.GetFileName(dto.Image.FileName);
-        var filePath = Path.Combine(uploadsFolder, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await dto.Image.CopyToAsync(stream);
-        }
-
-        var product = new Product
-        {
-            Name = dto.Name,
-            Description = dto.Description,
-            Price = dto.Price,
-            Brand = dto.Brand,
-            Type = dto.Type,
-            QuantityInStock = dto.QuantityInStock,
-            PictureUrl = fileName // samo naziv fajla
-        };
-
-        _repo.AddProduct(product);
-        await _repo.SaveChangesAsync();
-
-        return new ProductDto(product);
     }
 
     public async Task<ProductDto?> UpdateProductWithImageAsync(ProductWithImageDto dto)
