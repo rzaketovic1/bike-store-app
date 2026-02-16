@@ -28,7 +28,7 @@ namespace Infrastructure.Services
             {
                 Email = email,
                 DisplayName = displayName,
-                PasswordHash = HashPassword(password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
             };
             await _userRepo.AddUserAsync(user);
             await _userRepo.SaveChangesAsync();
@@ -38,17 +38,9 @@ namespace Infrastructure.Services
         public async Task<User?> AuthenticateAsync(string email, string password)
         {
             var user = await _userRepo.GetByEmailAsync(email);
-            if (user == null || user.PasswordHash != HashPassword(password))
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 return null;
             return user;
-        }
-
-        private string HashPassword(string password)
-        {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
         }
     }
 }

@@ -1,1 +1,263 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~bootstrap/dist/css/bootstrap.min.css';
+@import '~ngx-toastr/toastr.css';
+
+/* Custom Bike Store Theme */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #e74c3c;
+  --accent-color: #3498db;
+  --success-color: #27ae60;
+  --dark-bg: #1a252f;
+  --light-bg: #f8f9fa;
+  --text-primary: #2c3e50;
+  --text-light: #7f8c8d;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --card-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+/* Button enhancements */
+.btn {
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-color), #2980b9);
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color), #229954);
+  border: none;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--secondary-color), #c0392b);
+  border: none;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* Card enhancements */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+/* Form enhancements */
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Modal enhancements */
+.modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, var(--primary-color), #34495e);
+  color: white;
+  border-radius: 16px 16px 0 0;
+  border-bottom: none;
+}
+
+.modal-title {
+  font-weight: 700;
+}
+
+.modal-footer {
+  border-top: 1px solid #e0e0e0;
+  padding: 1.5rem;
+}
+
+/* Pagination styling */
+.pagination {
+  margin-top: 2rem;
+}
+
+.page-link {
+  color: var(--accent-color);
+  border-radius: 8px;
+  margin: 0 0.25rem;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.page-item.active .page-link {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  font-weight: 600;
+}
+
+/* Loading spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.spinner-border {
+  width: 4rem;
+  height: 4rem;
+  color: var(--accent-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-color), #e74c3c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shadow-custom {
+  box-shadow: var(--card-shadow);
+}
+
+.shadow-custom-lg {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: 1px;
+}
+
+/* Footer */
+.footer {
+  margin-top: auto;
+  background: linear-gradient(135deg, var(--dark-bg), #2c3e50);
+  color: white;
+  padding: 2rem 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}

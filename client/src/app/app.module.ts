@@ -13,6 +13,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ToastrModule } from 'ngx-toastr';
     ProductListComponent,
     ProductDetailsComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    LoadingSpinnerComponent
   ],
   imports: [
     BrowserModule,

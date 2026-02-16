@@ -11,19 +11,25 @@ export class RegisterComponent {
   email = '';
   password = '';
   displayName = '';
-    error = '';
+  error = '';
+  isLoading = false;
 
   constructor(private authService: AuthService, private router: Router, private appComponent: AppComponent) {}
 
-    onSubmit() {
+  onSubmit() {
+    this.isLoading = true;
+    this.error = '';
+    
     this.authService.register(this.email, this.password, this.displayName).subscribe({
       next: (response) => {
         this.authService.saveUser({ displayName: response.displayName, token: response.token });
-        this.appComponent.refreshUserDisplayName(); // OVO JE KLJUČ!
+        this.appComponent.refreshUserDisplayName();
+        this.isLoading = false;
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.error = err.error || 'Login failed';
+        this.error = err.error || 'Registration failed. Please try again.';
+        this.isLoading = false;
       }
     });
   }

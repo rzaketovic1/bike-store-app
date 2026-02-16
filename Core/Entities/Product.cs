@@ -10,7 +10,7 @@ public class Product : BaseEntity
     public required string Brand { get; set; }
     public int QuantityInStock { get; set; }
 
-
+    // These fields are optional for future improvements
     public string? FrameSize { get; set; }
     public string? WheelSize { get; set; }
     public string? Color { get; set; }

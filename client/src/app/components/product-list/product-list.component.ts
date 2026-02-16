@@ -15,6 +15,7 @@ export class ProductListComponent implements OnInit {
   brands: string[] = [];
   types: string[] = [];
   sort: string = '';
+  isLoading: boolean = false;
   
 
   selectedFile: File | null = null;
@@ -57,6 +58,7 @@ export class ProductListComponent implements OnInit {
     const brand = this.selectedBrand === 'All' ? undefined : this.selectedBrand;
     const type = this.selectedType === 'All' ? undefined : this.selectedType;
   
+    this.isLoading = true;
     this.productService
       .getPaginatedProducts(brand, type, this.sort, this.pageNumber, this.pageSize)
       .subscribe({
@@ -68,8 +70,12 @@ export class ProductListComponent implements OnInit {
             totalCount: res.totalCount,
             totalPages: res.totalPages
           };
+          this.isLoading = false;
         },
-        error: err => console.error(err)
+        error: err => {
+          console.error(err);
+          this.isLoading = false;
+        }
       });
   }
 

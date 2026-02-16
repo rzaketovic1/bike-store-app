@@ -1,47 +1,118 @@
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <h2 class="mb-4">Register</h2>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-custom-lg fade-in">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-person-plus-fill text-success mb-3" viewBox="0 0 16 16">
+              <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+              <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+            <h2 class="fw-bold mb-2">Create Account</h2>
+            <p class="text-muted">Join our bike community today</p>
+          </div>
 
-    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-      <div class="mb-3">
-        <label for="displayName" class="form-label">Display Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="displayName"
-          name="displayName"
-          required
-          [(ngModel)]="displayName"
-        />
+          <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+            <div class="mb-4">
+              <label for="displayName" class="form-label fw-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill me-1" viewBox="0 0 16 16">
+                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
+                Display Name
+              </label>
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                id="displayName"
+                name="displayName"
+                placeholder="Enter your name"
+                required
+                [(ngModel)]="displayName"
+                #displayNameField="ngModel"
+              />
+              <div *ngIf="displayNameField.invalid && displayNameField.touched" class="text-danger small mt-1">
+                Display name is required
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="email" class="form-label fw-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-fill me-1" viewBox="0 0 16 16">
+                  <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
+                </svg>
+                Email Address
+              </label>
+              <input
+                type="email"
+                class="form-control form-control-lg"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+                [(ngModel)]="email"
+                #emailField="ngModel"
+              />
+              <div *ngIf="emailField.invalid && emailField.touched" class="text-danger small mt-1">
+                Please enter a valid email address
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="password" class="form-label fw-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill me-1" viewBox="0 0 16 16">
+                  <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                </svg>
+                Password
+              </label>
+              <input
+                type="password"
+                class="form-control form-control-lg"
+                id="password"
+                name="password"
+                placeholder="Create a password"
+                required
+                minlength="6"
+                [(ngModel)]="password"
+                #passwordField="ngModel"
+              />
+              <div *ngIf="passwordField.invalid && passwordField.touched" class="text-danger small mt-1">
+                Password must be at least 6 characters
+              </div>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger d-flex align-items-center" role="alert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              </svg>
+              {{ error }}
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-success btn-lg w-100 mb-3"
+              [disabled]="registerForm.invalid || isLoading"
+            >
+              <span *ngIf="!isLoading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-2" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+                Create Account
+              </span>
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Creating account...
+              </span>
+            </button>
+
+            <div class="text-center">
+              <p class="text-muted">
+                Already have an account? 
+                <a routerLink="/login" class="text-primary fw-bold text-decoration-none">Sign in here</a>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          name="email"
-          required
-          [(ngModel)]="email"
-        />
-      </div>
-
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          name="password"
-          required
-          [(ngModel)]="password"
-        />
-      </div>
-
-      <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">
-        Register
-      </button>
-    </form>
+    </div>
   </div>
 </div>

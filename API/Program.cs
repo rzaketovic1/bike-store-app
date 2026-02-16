@@ -30,6 +30,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 
 
@@ -61,7 +62,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // (Optional) include XML comments if available
+    // (Optional) include XML comments if available for better Swagger documentation
     var xmlName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlName);
     if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);

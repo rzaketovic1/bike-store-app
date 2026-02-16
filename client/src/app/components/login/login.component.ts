@@ -11,6 +11,7 @@ export class LoginComponent {
   email = '';
   password = '';
   error = '';
+  isLoading = false;
 
     constructor(
     private authService: AuthService, 
@@ -19,14 +20,19 @@ export class LoginComponent {
   ) {}
 
   onSubmit() {
+    this.isLoading = true;
+    this.error = '';
+    
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.authService.saveUser({ displayName: response.displayName, token: response.token });
         this.appComponent.refreshUserDisplayName();
+        this.isLoading = false;
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.error = err.error || 'Login failed';
+        this.error = err.error || 'Login failed. Please check your credentials.';
+        this.isLoading = false;
       }
     });
   }

@@ -7,10 +7,12 @@ namespace Infrastructure.Services;
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repo;
+    private readonly IFileUploadService _fileUploadService;
 
-    public ProductService(IProductRepository repo)
+    public ProductService(IProductRepository repo, IFileUploadService fileUploadService)
     {
         _repo = repo;
+        _fileUploadService = fileUploadService;
     }
 
     public async Task<PaginatedList<ProductDto>> GetProductsAsync(string? brand, string? type, string? sort, int pageIndex, int pageSize)
@@ -26,9 +28,9 @@ public class ProductService : IProductService
         return product == null ? null : new ProductDto(product);
     }
 
-    public async Task<ProductDto> CreateProduct(ProductDto productDto)
+    public async Task<ProductDto> CreateProduct(CreateProductDto dto)
     {
-        var product = productDto.ToEntity();
+        var product = dto.ToEntity();
         _repo.AddProduct(product);
         await _repo.SaveChangesAsync();
         return new ProductDto(product);
@@ -36,21 +38,18 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> CreateProductWithImageAsync(ProductWithImageDto dto)
     {
+        // Image is required for create
         if (dto.Image == null || dto.Image.Length == 0)
-            throw new ArgumentException("Image file is required");
+            throw new ArgumentException("Image file is required when creating a product");
 
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/products");
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
+        // Validate image
+        if (!_fileUploadService.IsValidImage(dto.Image))
+            throw new ArgumentException("Invalid image file. Allowed types: jpg, jpeg, png, gif, webp. Max size: 5MB");
 
-        var fileName = Path.GetFileName(dto.Image.FileName);
-        var filePath = Path.Combine(uploadsFolder, fileName);
+        // Upload image
+        var fileName = await _fileUploadService.UploadImageAsync(dto.Image);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await dto.Image.CopyToAsync(stream);
-        }
-
+        // Create product
         var product = new Product
         {
             Name = dto.Name,
@@ -59,7 +58,7 @@ public class ProductService : IProductService
             Brand = dto.Brand,
             Type = dto.Type,
             QuantityInStock = dto.QuantityInStock,
-            PictureUrl = fileName // only file name
+            PictureUrl = fileName
         };
 
         _repo.AddProduct(product);
@@ -68,11 +67,11 @@ public class ProductService : IProductService
         return new ProductDto(product);
     }
 
-    public async Task<bool> UpdateProduct(int id, ProductDto productDto)
+    public async Task<ProductDto?> UpdateProduct(int id, ProductDto productDto)
     {
         var existing = await _repo.GetProductByIdAsync(id);
-        if (existing == null) return false;
-        // Mapiraj polja
+        if (existing == null) return null;
+
         existing.Name = productDto.Name;
         existing.Description = productDto.Description;
         existing.Price = productDto.Price;
@@ -80,15 +79,24 @@ public class ProductService : IProductService
         existing.Type = productDto.Type;
         existing.Brand = productDto.Brand;
         existing.QuantityInStock = productDto.QuantityInStock;
-        // Mapiraj ostala polja ako ih imaš
+
         _repo.UpdateProduct(existing);
-        return await _repo.SaveChangesAsync();
+        await _repo.SaveChangesAsync();
+
+        return new ProductDto(existing);
     }
 
     public async Task<bool> DeleteProduct(int id)
     {
         var existing = await _repo.GetProductByIdAsync(id);
         if (existing == null) return false;
+
+        // Delete associated image
+        if (!string.IsNullOrEmpty(existing.PictureUrl))
+        {
+            _fileUploadService.DeleteImage(existing.PictureUrl);
+        }
+
         _repo.DeleteProduct(existing);
         return await _repo.SaveChangesAsync();
     }
@@ -103,12 +111,12 @@ public class ProductService : IProductService
         return await _repo.GetTypesAsync();
     }
 
-    public async Task<ProductDto?> UpdateProductWithImageAsync(ProductWithImageDto dto)
+    public async Task<ProductDto?> UpdateProductWithImageAsync(int id, ProductWithImageDto dto)
     {
-        var product = await _repo.GetProductByIdAsync(dto.Id);
+        var product = await _repo.GetProductByIdAsync(id);
         if (product == null) return null;
 
-        // Update polja
+        // Update basic fields
         product.Name = dto.Name;
         product.Description = dto.Description;
         product.Price = dto.Price;
@@ -116,17 +124,20 @@ public class ProductService : IProductService
         product.Type = dto.Type;
         product.QuantityInStock = dto.QuantityInStock;
 
-        // Ako je stigla nova slika
-        if (dto.Image != null)
+        // Update image if provided (optional for updates)
+        if (dto.Image != null && dto.Image.Length > 0)
         {
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.Image.FileName);
-            var filePath = Path.Combine("wwwroot/images/products", fileName);
+            if (!_fileUploadService.IsValidImage(dto.Image))
+                throw new ArgumentException("Invalid image file. Allowed types: jpg, jpeg, png, gif, webp. Max size: 5MB");
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            // Delete old image
+            if (!string.IsNullOrEmpty(product.PictureUrl))
             {
-                await dto.Image.CopyToAsync(stream);
+                _fileUploadService.DeleteImage(product.PictureUrl);
             }
 
+            // Upload new image
+            var fileName = await _fileUploadService.UploadImageAsync(dto.Image);
             product.PictureUrl = fileName;
         }
 

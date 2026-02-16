@@ -1,0 +1,17 @@
+.hover-link {
+  transition: all 0.3s ease;
+}
+
+.hover-link:hover {
+  color: white !important;
+  padding-left: 5px;
+}
+
+.hover-icon {
+  transition: all 0.3s ease;
+}
+
+.hover-icon:hover {
+  color: white !important;
+  transform: translateY(-3px);
+}
