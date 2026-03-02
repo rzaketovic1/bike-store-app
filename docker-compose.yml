@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres-db:
     image: postgres:16
-    container_name: postgres-db
+    container_name: bikestore-postgres
     restart: always
     environment:
       POSTGRES_DB: bikestoredb
@@ -13,44 +13,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    networks:
-      - app-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
       timeout: 5s
-      retries: 10
-
-  api:
-    build:
-      context: .
-      dockerfile: ./API/Dockerfile
-    ports:
-      - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=bikestoredb;Username=postgres;Password=postgres
-    depends_on:
-      postgres-db:
-        condition: service_healthy
-    networks:
-      - app-network
-
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    ports:
-      - "4200:80"
-    depends_on:
-      - api
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      retries: 5
 
 volumes:
   postgres-data:
+    driver: local
