@@ -13,16 +13,13 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
-import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
-
 @NgModule({
   declarations: [
     AppComponent,
     ProductListComponent,
     ProductDetailsComponent,
     LoginComponent,
-    RegisterComponent,
-    LoadingSpinnerComponent
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +30,7 @@ import { LoadingSpinnerComponent } from './components/loading-spinner/loading-sp
     BrowserAnimationsModule,
     ToastrModule.forRoot({
       positionClass: 'toast-bottom-center',
-      timeOut: 3000,
+      timeOut: 6000,
       closeButton: true,
       progressBar: true
     }),

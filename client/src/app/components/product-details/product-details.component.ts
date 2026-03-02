@@ -33,7 +33,11 @@ export class ProductDetailsComponent implements OnInit {
   loadProduct(id: number): void {
     this.productService.getProduct(id).subscribe({
       next: res => this.product = res,
-      error: err => console.error('Product not found', err)
+      error: err => {
+        console.error('Product not found', err);
+        this.toastr.error('Product not found', 'Error');
+        this.router.navigate(['/']);
+      }
     });
   }
 
@@ -90,8 +94,13 @@ export class ProductDetailsComponent implements OnInit {
     this.selectedFile = null;
     this.loadProduct(this.product!.id);
   },
-  error: () => {
-    this.toastr.error('Error updating product.');
+  error: (error) => {
+    if (error.status === 400 && error.error?.errors) {
+      const errorMessages = this.extractValidationErrors(error.error.errors);
+      errorMessages.forEach(msg => this.toastr.error(msg, 'Validation Error'));
+    } else {
+      this.toastr.error(error.error?.title || 'Error updating product.', 'Error');
+    }
   }
 });
   }
@@ -110,5 +119,18 @@ export class ProductDetailsComponent implements OnInit {
     }
   });
   }
+  }
+
+  private extractValidationErrors(errors: any): string[] {
+    const messages: string[] = [];
+    for (const field in errors) {
+      if (errors.hasOwnProperty(field)) {
+        const fieldErrors = errors[field];
+        if (Array.isArray(fieldErrors)) {
+          fieldErrors.forEach(error => messages.push(`${field}: ${error}`));
+        }
+      }
+    }
+    return messages;
   }
 }
