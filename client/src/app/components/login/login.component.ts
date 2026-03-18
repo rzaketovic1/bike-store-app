@@ -31,7 +31,16 @@ export class LoginComponent {
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.error = err.error || 'Login failed. Please check your credentials.';
+        if (err.error?.errors) {
+          const messages = Object.values(err.error.errors).flat();
+          this.error = messages.join(', ');
+        } else if (err.error?.message) {
+          this.error = err.error.message;
+        } else if (typeof err.error === 'string') {
+          this.error = err.error;
+        } else {
+          this.error = 'Login failed. Please check your credentials.';
+        }
         this.isLoading = false;
       }
     });

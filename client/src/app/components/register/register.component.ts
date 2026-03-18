@@ -28,7 +28,16 @@ export class RegisterComponent {
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.error = err.error || 'Registration failed. Please try again.';
+        if (err.error?.errors) {
+          const messages = Object.values(err.error.errors).flat();
+          this.error = messages.join(', ');
+        } else if (err.error?.message) {
+          this.error = err.error.message;
+        } else if (typeof err.error === 'string') {
+          this.error = err.error;
+        } else {
+          this.error = 'Registration failed. Please try again.';
+        }
         this.isLoading = false;
       }
     });

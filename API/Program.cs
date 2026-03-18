@@ -77,8 +77,7 @@ builder.Services.AddCors(opt =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithOrigins(
-                "http://localhost:4200",
-                "https://bike-store-client.onrender.com"
+                "http://localhost:4200"
             );
     });
 });
