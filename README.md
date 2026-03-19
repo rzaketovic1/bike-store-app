@@ -1,6 +1,16 @@
 # 🚴 Bike Store App
 
-Bike Store App is a modern CRUD web application for browsing and managing bicycles. Built with **ASP.NET Core (.NET 8)**, **Angular**, and **PostgreSQL**, the app demonstrates clean code principles and N-Tier architecture, with secure authentication, database integration with Docker containerization.
+A full-stack e-commerce application for browsing and managing bicycles, showcasing modern web development practices and enterprise-level architecture. Built with **ASP.NET Core (.NET 8)**, **Angular 17**, and **PostgreSQL**, this project demonstrates clean architecture principles, secure JWT authentication, RESTful API design, and containerized deployment with Docker.
+
+**Key Highlights:**
+- 🏗️ **N-Tier Architecture** – clean separation of concerns across API, Service, Repository, and Data layers
+- 🔐 **JWT Authentication** – secure token-based user authentication and authorization
+- 📦 **Entity Framework Core** – code-first migrations and database seeding
+- 🎨 **Angular SPA** – responsive UI with Bootstrap 5 and reactive forms
+- 🐳 **Docker Support** – containerized PostgreSQL for consistent development environments
+- 📸 **File Uploads** – image management with validation and secure storage
+- 🔍 **Advanced Filtering** – pagination, sorting, and multi-criteria search
+- 📝 **Swagger/OpenAPI** – interactive API documentation and testing
 
 ## 📦 Prerequisites
 
@@ -133,6 +143,12 @@ Check JWT configuration in `API/appsettings.Development.json`:
 - Ensure PostgreSQL is running
 - Verify `ConnectionStrings:DefaultConnection`
 
+### Reset the database to initial state
+
+- Drop the database completely
+  `dotnet ef database drop --project Infrastructure --startup-project API`
+- Recreate and apply migrations with seed data
+  `dotnet ef database update --project Infrastructure --startup-project API`
 ### CORS Errors
 
 - Ensure frontend runs on `http://localhost:4200`
@@ -141,33 +157,5 @@ Check JWT configuration in `API/appsettings.Development.json`:
 ### Swagger Not Loading
 
 - Ensure API is running on `http://localhost:5000`
-
-## Key Features
-
-This project demonstrates modern web application development using:
-
-- **Authentication & Authorization** – JWT-based login and registration
-- **Product Management (CRUD)** – add, edit, delete, and view bicycles
-- **Image Uploads** – store and display product images
-- **Filtering & Search** – by brand, type, and other attributes
-- **Admin Features** – restricted CRUD operations for admins only
-- **RESTful API** – data exchange with validated DTOs
-
-## Architecture
-
-The application follows N-Tier architecture and clean code best practices:
-
-- UI (Angular) – user interface with reusable components and Bootstrap styling
-- API Controllers (ASP.NET Core) – handle requests from the frontend
-- Services Layer – business logic and authorization
-- Repository Layer – database access via Entity Framework Core
-- DbContext – database connection and model configuration
-- Migrations – versioning and database updates
-- JWT Authentication – secure user identity management
-- Data Transfer Objects (DTOs) – separation of domain models and API layer
-- HttpClient – API communication
-- Interceptor – automatic JWT token handling
-- Bootstrap 5 – responsive design and UI components
-- Swagger – interactive API documentation
 
 ---
