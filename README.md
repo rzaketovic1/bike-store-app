@@ -12,6 +12,10 @@ A full-stack e-commerce application for browsing and managing bicycles, showcasi
 - 🔍 **Advanced Filtering** – pagination, sorting, and multi-criteria search
 - 📝 **Swagger/OpenAPI** – interactive API documentation and testing
 
+## 🎥 Demo Video
+
+[Watch Short Demo Video on this link](https://drive.google.com/file/d/1n5B1ZlDjd0kNVP7mGjW3dyitbCQg46fS/view?usp=sharing)
+
 ## 📦 Prerequisites
 
 Install the following tools before running the app:
