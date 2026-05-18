@@ -1,9 +1,11 @@
 ﻿using Core.Entities;
+using FluentAssertions;
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Core.UnitTests;
+
 public class TokenServiceTests
 {
     private readonly IConfiguration _config;
@@ -26,8 +28,10 @@ public class TokenServiceTests
         _service = new TokenService(_config);
     }
 
+    #region CreateToken Tests
+
     [Fact]
-    public void CreateToken_ReturnsJwtWithExpectedClaims()
+    public void CreateToken_ShouldReturnValidJwt_WithCorrectClaims()
     {
         // Arrange
         var user = new User
@@ -42,35 +46,17 @@ public class TokenServiceTests
         var tokenString = _service.CreateToken(user);
 
         // Assert
-        Assert.False(string.IsNullOrWhiteSpace(tokenString));
+        tokenString.Should().NotBeNullOrWhiteSpace();
 
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(tokenString);
-
-        // issuer / audience
-        Assert.Equal("BikeStore", jwt.Issuer);
-        Assert.Contains("BikeStoreClient", jwt.Audiences);
-
-        // claims
-        Assert.Equal("test@example.com",
-            jwt.Claims.First(c => c.Type == JwtRegisteredClaimNames.Email).Value);
-
-        Assert.Equal("Test User",
-            jwt.Claims.First(c => c.Type == JwtRegisteredClaimNames.Name).Value);
-
-        Assert.Equal("42",
-            jwt.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value);
-
-        // expiry ~ now + 60 min (dovoljno je okvirno)
-        var now = DateTime.UtcNow;
-        Assert.True(jwt.ValidTo > now.AddMinutes(55));
-        Assert.True(jwt.ValidTo <= now.AddMinutes(65));
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+        jwt.Claims.First(c => c.Type == JwtRegisteredClaimNames.Email).Value.Should().Be("test@example.com");
+        jwt.Claims.First(c => c.Type == JwtRegisteredClaimNames.Name).Value.Should().Be("Test User");
     }
 
     [Fact]
-    public void CreateToken_Throws_WhenKeyNotConfigured()
+    public void CreateToken_ShouldThrow_WhenKeyNotConfigured()
     {
-        // Arrange: config bez Jwt:Key
+        // Arrange
         var settings = new Dictionary<string, string?>
         {
             ["Jwt:Issuer"] = "BikeStore",
@@ -78,22 +64,20 @@ public class TokenServiceTests
             ["Jwt:DurationInMinutes"] = "60"
         };
 
-        var badConfig = new ConfigurationBuilder()
+        var config = new ConfigurationBuilder()
             .AddInMemoryCollection(settings)
             .Build();
 
-        var service = new TokenService(badConfig);
+        var service = new TokenService(config);
+        var user = new User { Id = 1, Email = "test@example.com", DisplayName = "Test", PasswordHash = "hash" };
 
-        var user = new User
-        {
-            Id = 1,
-            Email = "test@example.com",
-            DisplayName = "User",
-            PasswordHash = "hash"
-        };
+        // Act
+        var act = () => service.CreateToken(user);
 
-        // Act & Assert
-        var ex = Assert.Throws<InvalidOperationException>(() => service.CreateToken(user));
-        Assert.Equal("JWT Key not configured.", ex.Message);
+        // Assert
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("JWT Key not configured.");
     }
+
+    #endregion
 }

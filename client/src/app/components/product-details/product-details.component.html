@@ -10,18 +10,18 @@
     </div>
 
     <div class="col-md-6">
-      <h2 class="mb-3">{{ product!.name }}</h2>
-      <h4 class="text-primary mb-3">${{ product!.price }}</h4>
+      <h2 class="mb-3" data-testid="product-name">{{ product!.name }}</h2>
+      <h4 data-testid="product-price" class="text-primary mb-3">${{ product!.price }}</h4>
 
-      <p class="mb-4">
+      <p data-testid="product-description" class="mb-4">
         <strong>Description:</strong><br />
         {{ product!.description }}
       </p>
 
       <ul class="list-group mb-4">
-        <li class="list-group-item"><strong>Brand:</strong> {{ product!.brand }}</li>
-        <li class="list-group-item"><strong>Type:</strong> {{ product!.type }}</li>
-        <li class="list-group-item"><strong>In Stock:</strong> {{ product!.quantityInStock }}</li>
+        <li data-testid="product-brand" class="list-group-item"><strong>Brand:</strong> {{ product!.brand }}</li>
+        <li data-testid="product-type" class="list-group-item"><strong>Type:</strong> {{ product!.type }}</li>
+        <li data-testid="product-stock" class="list-group-item"><strong>In Stock:</strong> {{ product!.quantityInStock }}</li>
       </ul>
 
       <button class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#editProductModal">

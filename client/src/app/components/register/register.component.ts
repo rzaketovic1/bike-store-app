@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppComponent } from 'src/app/app.component';
 import { AuthService } from 'src/app/services/auth.service';
@@ -16,9 +17,17 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router, private appComponent: AppComponent) {}
 
-  onSubmit() {
-    this.isLoading = true;
+  onSubmit(form: NgForm) {
     this.error = '';
+
+    if (form.invalid) {
+      if (form.controls['email']?.errors?.['email']) {
+        this.error = 'Invalid email format';
+      }
+      return;
+    }
+
+    this.isLoading = true;
     
     this.authService.register(this.email, this.password, this.displayName).subscribe({
       next: (response) => {

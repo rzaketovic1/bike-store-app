@@ -3,15 +3,16 @@
   <!-- Page Header -->
   <div class="row mb-4">
     <div class="col-12">
-      <h1 class="display-4 fw-bold text-center mb-2">
+      <h1 data-testid="products-heading" class="display-4 fw-bold text-center mb-2">
         <span class="text-gradient">Explore Our Collection</span>
       </h1>
-      <p class="text-center text-muted lead">Find your perfect ride from our premium selection of bikes</p>
+      <p data-testid="products-subtitle" class="text-center text-muted lead">Find your perfect ride from our premium selection of bikes</p>
     </div>
   </div>
 
   <!-- Add Product Button -->
   <button 
+    data-testid="add-product-button"
     class="btn btn-success mb-4 px-4 py-2 fw-bold shadow-sm"
     data-bs-toggle="modal" 
     data-bs-target="#createProductModal"
@@ -47,7 +48,7 @@
             </div>
             <div class="mb-3">
               <label for="image" class="form-label">Select Image</label>
-              <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
+              <input id="image" type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
             </div>
             <div class="mb-3">
               <label for="brand" class="form-label">Brand</label>
@@ -69,10 +70,10 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary fw-semibold px-4" data-bs-dismiss="modal" title="Cancel and close">
+            <button data-testid="create-modal-close" type="button" class="btn btn-outline-secondary fw-semibold px-4" data-bs-dismiss="modal" title="Cancel and close">
               ✖ Close
             </button>
-            <button type="submit" class="btn btn-primary fw-bold px-4" title="Create new product">
+            <button data-testid="create-modal-submit" type="submit" class="btn btn-primary fw-bold px-4" title="Create new product">
               ✅ Create
             </button>
           </div>
@@ -82,7 +83,7 @@
   </div>
 
   <!-- Filter by Brand -->
-  <div class="mb-3 filter-section">
+  <div data-testid="brand-filter-section" class="mb-3 filter-section">
     <strong>
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel-fill me-2" viewBox="0 0 16 16">
         <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
@@ -101,7 +102,7 @@
   </div>
 
   <!-- Filter by Type -->
-  <div class="mb-3 filter-section">
+  <div data-testid="type-filter-section" class="mb-3 filter-section">
     <strong>
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tag-fill me-2" viewBox="0 0 16 16">
         <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
@@ -121,13 +122,13 @@
 
   <!-- Sort by -->
   <div class="mb-4">
-    <strong>
+    <label for="sortProducts" class="fw-bold">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sort-down me-2" viewBox="0 0 16 16">
         <path d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z"/>
       </svg>
       Sort by:
-    </strong>
-    <select class="form-select w-auto d-inline-block ms-2" [(ngModel)]="sort" (change)="onSortChanged()">
+    </label>
+    <select id="sortProducts" class="form-select w-auto d-inline-block ms-2" [(ngModel)]="sort" (change)="onSortChanged()">
       <option *ngFor="let option of sortOptions" [value]="option.value">
         {{ option.name }}
       </option>
@@ -137,7 +138,7 @@
   <!-- Products Grid -->
   <div class="row g-4 fade-in">
     <div class="col-md-6 col-lg-4" *ngFor="let product of products">
-      <div class="card h-100 product-card" [routerLink]="['/product', product.id]" style="cursor: pointer;">
+      <div data-testid="product-card" class="card h-100 product-card" [routerLink]="['/product', product.id]" style="cursor: pointer;">
         <div class="card-img-wrapper">
           <img
             [src]="getImageUrl(product.pictureUrl)"
@@ -157,8 +158,8 @@
               <span class="h4 text-success fw-bold">{{ product.price | currency }}</span>
             </p>
             <div class="d-flex justify-content-between align-items-center">
-              <span class="badge bg-secondary">{{ product.brand }}</span>
-              <span class="badge bg-info text-dark">{{ product.type }}</span>
+              <span data-testid="product-brand-badge" class="badge bg-secondary">{{ product.brand }}</span>
+              <span data-testid="product-type-badge" class="badge bg-info text-dark">{{ product.type }}</span>
             </div>
             <div class="mt-2">
               <small class="text-muted">
@@ -175,7 +176,7 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && products.length === 0" class="text-center py-5">
+  <div data-testid="products-empty-state" *ngIf="!isLoading && products.length === 0" class="text-center py-5">
     <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-inbox text-muted mb-3" viewBox="0 0 16 16">
       <path d="M4.98 4a.5.5 0 0 0-.39.188L1.54 8H6a.5.5 0 0 1 .5.5 1.5 1.5 0 1 0 3 0A.5.5 0 0 1 10 8h4.46l-3.05-3.812A.5.5 0 0 0 11.02 4H4.98zm9.954 5H10.45a2.5 2.5 0 0 1-4.9 0H1.066l.32 2.562a.5.5 0 0 0 .497.438h12.234a.5.5 0 0 0 .496-.438L14.933 9zM3.809 3.563A1.5 1.5 0 0 1 4.981 3h6.038a1.5 1.5 0 0 1 1.172.563l3.7 4.625a.5.5 0 0 1 .105.374l-.39 3.124A1.5 1.5 0 0 1 14.117 13H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .106-.374l3.7-4.625z"/>
     </svg>
@@ -184,7 +185,7 @@
   </div>
 
   <!-- Pagination -->
-  <nav *ngIf="pagination && !isLoading" class="mt-4">
+  <nav data-testid="products-pagination" aria-label="Products pagination" *ngIf="pagination && !isLoading" class="mt-4">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="pagination.pageIndex === 1">
         <a class="page-link" (click)="onPageChanged(pagination.pageIndex - 1)">Previous</a>
