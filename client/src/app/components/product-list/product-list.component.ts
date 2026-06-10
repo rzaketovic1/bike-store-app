@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Pagination } from 'src/app/models/pagination';
 import { Product } from 'src/app/models/product';
 import { ProductService } from 'src/app/services/product.service';
+import { CartService } from 'src/app/services/cart.service';
 import { environment } from '../../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 declare var bootstrap: any;
 
@@ -19,6 +22,7 @@ export class ProductListComponent implements OnInit {
   typesForForm: string[] = [];   // types without "All"
   sort: string = '';
   isLoading: boolean = false;
+  cartProductIds$!: Observable<Set<number>>;
   
 
   selectedFile: File | null = null;
@@ -51,13 +55,30 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
+    this.cartProductIds$ = this.cartService.cartItems$.pipe(
+      map(items => new Set(items.map(i => i.product.id)))
+    );
     this.loadProducts();
     this.loadBrands();
     this.loadTypes();
+  }
+
+  addToCart(product: Product, event: Event): void {
+    event.stopPropagation();
+    if (product.quantityInStock === 0) return;
+    this.cartService.addItem(product);
+    this.toastr.success(`${product.name} added to cart.`, 'Cart');
+  }
+
+  removeFromCart(productId: number, event: Event): void {
+    event.stopPropagation();
+    this.cartService.removeItem(productId);
+    this.toastr.info('Item removed from cart.', 'Cart');
   }
 
   loadProducts(): void {

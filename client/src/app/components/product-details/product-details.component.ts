@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from 'src/app/models/product';
 import { ProductService } from 'src/app/services/product.service';
+import { CartService } from 'src/app/services/cart.service';
 import { environment } from '../../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-details',
@@ -15,19 +18,36 @@ export class ProductDetailsComponent implements OnInit {
   selectedFile: File | null = null;
   brands: string[] = [];
   types: string[] = [];
+  isInCart$!: Observable<boolean>;
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
+    private cartService: CartService,
     private router: Router,
     private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.isInCart$ = this.cartService.cartItems$.pipe(
+      map(items => items.some(i => i.product.id === id))
+    );
     this.loadProduct(id);
     this.loadBrands();
     this.loadTypes();
+  }
+
+  addToCart(): void {
+    if (!this.product || this.product.quantityInStock === 0) return;
+    this.cartService.addItem(this.product);
+    this.toastr.success(`${this.product.name} added to cart.`, 'Cart');
+  }
+
+  removeFromCart(): void {
+    if (!this.product) return;
+    this.cartService.removeItem(this.product.id);
+    this.toastr.info('Item removed from cart.', 'Cart');
   }
 
   loadProduct(id: number): void {
