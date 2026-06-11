@@ -77,7 +77,8 @@ builder.Services.AddCors(opt =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithOrigins(
-                "http://localhost:4200"
+                "http://localhost:4200",
+                "https://bike-store-app-eight.vercel.app"
             );
     });
 });
