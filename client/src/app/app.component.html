@@ -1,3 +1,4 @@
+<ng-container *ngIf="isServerReady; else serverStartupScreen">
 <nav data-testid="main-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" routerLink="/">
@@ -194,3 +195,22 @@
     </div>
   </div>
 </footer>
+</ng-container>
+
+<ng-template #serverStartupScreen>
+  <div class="startup-screen d-flex align-items-center justify-content-center text-center px-3">
+    <div class="startup-card p-4 p-md-5">
+      <div class="spinner-border text-primary startup-spinner" role="status" aria-hidden="true"></div>
+
+      <ng-container *ngIf="!isServerDelayed; else delayedState">
+        <h2 class="h4 mt-4 mb-2">Starting demo server...</h2>
+        <p class="text-muted mb-0">This demo uses free hosting, so the backend may take up to 60 seconds to wake up.</p>
+      </ng-container>
+
+      <ng-template #delayedState>
+        <h2 class="h4 mt-4 mb-3">Server is taking longer than expected.</h2>
+        <button type="button" class="btn btn-primary" (click)="retryHealthCheck()">Retry</button>
+      </ng-template>
+    </div>
+  </div>
+</ng-template>
