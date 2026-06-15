@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+using Core.Entities;
 using FluentAssertions;
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;

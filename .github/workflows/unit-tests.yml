@@ -1,0 +1,41 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ main, develop, e2e-tests ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Run API Unit Tests
+      run: dotnet test tests/API.UnitTests/API.UnitTests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=api-test-results.trx"
+
+    - name: Run Core Unit Tests
+      run: dotnet test tests/Core.UnitTests/Core.UnitTests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=core-test-results.trx"
+
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Unit Test Results
+        path: '**/*.trx'
+        reporter: dotnet-trx
+        fail-on-error: true
