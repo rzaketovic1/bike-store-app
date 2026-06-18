@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Prevent duplicate runs on the same branch/PR
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Backend tests + Frontend build
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Setup .NET 8 SDK
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Nice-to-have: Cache NuGet packages
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', '**/packages.lock.json', '**/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # 3) Restore backend dependencies
+      - name: Restore backend dependencies
+        run: dotnet restore API/API.csproj
+
+      # 4) Build backend solution/projects
+      - name: Build backend
+        run: dotnet build API/API.csproj --configuration Release --no-restore
+
+      # 5) Run all backend unit tests
+      - name: Run API unit tests
+        run: dotnet test tests/API.UnitTests/API.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=api-unit-tests.trx"
+
+      - name: Run Core unit tests
+        run: dotnet test tests/Core.UnitTests/Core.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=core-unit-tests.trx"
+
+      # 6) Publish test results in GitHub Actions summary/checks
+      - name: Publish backend test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            **/*.trx
+
+      # 7) Setup Node.js (latest LTS)
+      - name: Setup Node.js (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      # 8) Install Angular dependencies from /client using npm ci
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm ci
+
+      # 9) Build Angular application
+      - name: Build frontend
+        working-directory: client
+        run: npm run build
+
+# 10) Workflow fails automatically if any test or build step fails

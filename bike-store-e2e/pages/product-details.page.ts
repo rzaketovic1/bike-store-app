@@ -27,12 +27,12 @@ export class ProductDetailsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.productName = page.getByTestId('product-name');
-    this.productPrice = this.productPrice = page.getByTestId('product-price');
+    this.productPrice = page.getByTestId('product-price');
     this.productDescription = page.getByTestId('product-description');
     this.productBrand = page.getByTestId('product-brand');
     this.productType = page.getByTestId('product-type');
     this.productStock = page.getByTestId('product-stock');
-    this.productImage = this.productImage = page.getByAltText('product image');
+    this.productImage = page.getByAltText('product image');
     this.editButton = page.getByRole('button', { name: /edit/i });
     this.deleteButton = page.getByRole('button', { name: /delete/i });
 
@@ -92,6 +92,9 @@ export class ProductDetailsPage extends BasePage {
   }
 
   async deleteProduct() {
+    this.page.once('dialog', async (dialog) => {
+      await dialog.accept();
+    });
     await this.deleteButton.click();
   }
 }

@@ -4,6 +4,7 @@ const TEST_PRODUCT = {
   name: 'E2E Test Bike',
   description: 'A bike created for E2E testing',
   price: 499.99,
+  pictureUrl: '/images/products/test-image.jpg',
   brand: 'Trek',
   type: 'Mountain',
   quantityInStock: 10,

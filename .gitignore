@@ -489,3 +489,6 @@ client/node_modules/
 client/dist/
 client/.angular/
 client/.env
+
+# Playwright MCP snapshots
+page-*.yml

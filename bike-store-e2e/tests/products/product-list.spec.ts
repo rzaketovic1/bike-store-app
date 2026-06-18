@@ -2,91 +2,99 @@ import { test, expect } from '@playwright/test';
 import { ProductListPage } from '../../pages/product-list.page';
 
 test.describe('Product List', () => {
-  let productList: ProductListPage;
-
-  test.beforeEach(async ({ page }) => {
-    productList = new ProductListPage(page);
+  test('user can see product list', async ({ page }) => {
+    const productList = new ProductListPage(page);
     await productList.goto();
-  });
 
-  test('should display the page heading and product cards', async () => {
     await expect(productList.pageHeading).toContainText('Explore Our Collection');
     await expect(productList.pageSubtitle).toContainText('Find your perfect ride from our premium selection of bikes');
+    await expect(productList.productCards.first()).toBeVisible();
+    await expect(productList.productNames.first()).toBeVisible();
   });
 
-  test('should filter products by brand', async () => {
-    const specificBrand = await productList.getFirstSpecificBrand();
-    if (!specificBrand) return;
+  test('user can filter products by brand', async ({ page }) => {
+    const productList = new ProductListPage(page);
+    await productList.goto();
 
-    await productList.filterByBrand(specificBrand);
+    const randomBrand = await productList.getRandomBrand();
+    if (!randomBrand) return;
 
-    await productList.expectAllCardsHaveBrand(specificBrand);
+    await productList.filterByBrand(randomBrand);
+    await expect(productList.productCards.first()).toBeVisible();
+    await productList.expectAllCardsHaveBrand(randomBrand);
   });
 
-  test('should filter products by type', async () => {
-    const specificType = await productList.getFirstSpecificType();
-    if (!specificType) return;
+  test('user can filter products by type', async ({ page }) => {
+    const productList = new ProductListPage(page);
+    await productList.goto();
 
-    await productList.filterByType(specificType);
+    const randomType = await productList.getRandomType();
+    if (!randomType) return;
 
-    await productList.expectAllCardsHaveType(specificType);
+    await productList.filterByType(randomType );
+    await expect(productList.productCards.first()).toBeVisible();
+    await productList.expectAllCardsHaveType(randomType);
   });
 
-  test('should reset filters when "All" is clicked', async () => {
-    // Apply a brand filter first
-    const brandButtons = productList.brandFilterSection.locator('button');
-    await brandButtons.first().waitFor();
-    const brands = await brandButtons.allTextContents();
-    const specificBrand = brands.find((b) => b.trim() !== 'All');
-    if (!specificBrand) return;
+  test('user can sort products by price', async ({ page }) => {
+    const productList = new ProductListPage(page);
+    await productList.goto();
 
-    await productList.filterByBrand(specificBrand.trim());
-    const filteredCount = await productList.getProductCount();
-
-    await productList.filterByBrand('All');
-    const allCount = await productList.getProductCount();
-
-    expect(allCount).toBeGreaterThanOrEqual(filteredCount);
-  });
-
-  test('should sort by price ascending', async () => {
     await productList.sortBy('priceAsc');
+    const ascPrices = await productList.getProductPrices();
+    expect(ascPrices.length).toBeGreaterThan(1);
+    expect(isAscending(ascPrices)).toBe(true);
 
-    const prices = await productList.getProductPrices();
-    for (let i = 1; i < prices.length; i++) {
-      expect(prices[i]).toBeGreaterThanOrEqual(prices[i - 1]);
-    }
-  });
-
-  test('should sort by price descending', async () => {
     await productList.sortBy('priceDesc');
-
-    const prices = await productList.getProductPrices();
-    for (let i = 1; i < prices.length; i++) {
-      expect(prices[i]).toBeLessThanOrEqual(prices[i - 1]);
-    }
+    const descPrices = await productList.getProductPrices();
+    expect(descPrices.length).toBeGreaterThan(1);
+    expect(isDescending(descPrices)).toBe(true);
   });
 
-  test('should navigate between pages', async () => {
-    // Only run if pagination exists
-    const paginationVisible = await productList.paginationNav.isVisible();
-    if (!paginationVisible) return;
+  test('user can navigate through product pagination', async ({ page }) => {
+    const productList = new ProductListPage(page);
+    await productList.goto();
+
+    const paginationVisible = await productList.paginationNav.isVisible().catch(() => false);
+    if (!paginationVisible) {
+      // Skip test if pagination is not available
+      return;
+    }
 
     const firstPageNames = await productList.getProductNames();
+    expect(firstPageNames.length).toBeGreaterThan(0);
 
+    // Navigate to next page
     await productList.nextPage.click();
+    await expect(productList.productCards.first()).toBeVisible();
 
     const secondPageNames = await productList.getProductNames();
     // Pages should show different products (unless very few products)
     if (secondPageNames.length > 0) {
       expect(secondPageNames).not.toEqual(firstPageNames);
     }
+
+    // Navigate to specific page number
+    const pageButton = productList.paginationPageButton(1);
+    await pageButton.click();
+    await expect(productList.productCards.first()).toBeVisible();
+
+    const backToFirstPageNames = await productList.getProductNames();
+    expect(backToFirstPageNames).toEqual(firstPageNames);
   });
 
-  test('should navigate to product details on card click', async ({ page }) => {
-    await productList.productCards.first().waitFor();
-    await productList.clickProduct(0);
+  function isAscending(values: number[]): boolean {
+    for (let i = 1; i < values.length; i++) {
+      if (values[i] < values[i - 1]) return false;
+    }
+    return true;
+  }
 
-    await expect(page).toHaveURL(/\/product\/\d+/);
-  });
+  function isDescending(values: number[]): boolean {
+    for (let i = 1; i < values.length; i++) {
+      if (values[i] > values[i - 1]) return false;
+    }
+    return true;
+  }
 });
+

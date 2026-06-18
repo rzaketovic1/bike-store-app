@@ -5,10 +5,11 @@ export class ProductListPage extends BasePage {
   readonly pageHeading: Locator;
   readonly pageSubtitle: Locator;
   readonly productCards: Locator;
+  readonly productNames: Locator;
+  readonly productPrices: Locator;
   readonly addProductButton: Locator;
   readonly sortDropdown: Locator;
   readonly emptyState: Locator;
-  readonly loadingSpinner: Locator;
 
   // Create product modal
   readonly createModal: Locator;
@@ -36,10 +37,11 @@ export class ProductListPage extends BasePage {
     this.pageHeading = page.getByTestId('products-heading');
     this.pageSubtitle = page.getByTestId('products-subtitle');
     this.productCards = page.getByTestId('product-card');
+    this.productNames = page.getByTestId('product-name');
+    this.productPrices = page.getByTestId('product-price');
     this.addProductButton = page.getByTestId('add-product-button');
     this.sortDropdown = page.getByLabel('Sort by:');
     this.emptyState = page.getByTestId('products-empty-state');
-    this.loadingSpinner = page.locator('.spinner-border');
 
     // Create product modal
     this.createModal = page.locator('#createProductModal');
@@ -59,8 +61,8 @@ export class ProductListPage extends BasePage {
 
     // Pagination
     this.paginationNav = page.getByTestId('products-pagination');
-    this.previousPage = this.paginationNav.getByText('Previous');
-    this.nextPage = this.paginationNav.getByText('Next');
+    this.previousPage = this.paginationNav.getByText('Previous', { exact: true });
+    this.nextPage = this.paginationNav.getByText('Next', { exact: true });
   }
 
   async goto() {
@@ -77,42 +79,94 @@ export class ProductListPage extends BasePage {
 
   async filterByBrand(brand: string) {
     await this.brandFilterButton(brand).click();
+    // Wait for first brand badge to appear and be stable
+    const badges = this.page.getByTestId('product-brand-badge');
+    await badges.first().waitFor({ state: 'visible' });
+    // Give the UI a moment to render all filtered results
+    await this.page.waitForTimeout(500);
   }
 
   async filterByType(type: string) {
     await this.typeFilterButton(type).click();
+    // Wait for first type badge to appear and be stable
+    const badges = this.page.getByTestId('product-type-badge');
+    await badges.first().waitFor({ state: 'visible' });
+    // Give the UI a moment to render all filtered results
+    await this.page.waitForTimeout(500);
   }
 
-  async getFirstSpecificBrand(): Promise<string | undefined> {
+  async getRandomBrand(): Promise<string | undefined> {
     const buttons = this.brandFilterSection.getByRole('button');
     await buttons.first().waitFor();
     const labels = await buttons.allTextContents();
-    return labels.map((b) => b.trim()).find((b) => b !== 'All');
+    const specificBrands = labels.map((b) => b.trim()).filter((b) => b !== 'All');
+    return specificBrands.length > 0
+      ? specificBrands[Math.floor(Math.random() * specificBrands.length)]
+      : undefined;
   }
 
-  async getFirstSpecificType(): Promise<string | undefined> {
+  async getRandomType(): Promise<string | undefined> {
     const buttons = this.typeFilterSection.getByRole('button');
     await buttons.first().waitFor();
     const labels = await buttons.allTextContents();
-    return labels.map((t) => t.trim()).find((t) => t !== 'All');
+    const specificTypes = labels.map((t) => t.trim()).filter((t) => t !== 'All');
+    return specificTypes.length > 0
+      ? specificTypes[Math.floor(Math.random() * specificTypes.length)]
+      : undefined;
   }
 
   async expectAllCardsHaveBrand(brand: string) {
-    const count = await this.productCards.count();
+    // Get all brand badges (which are within product cards)
+    const badges = this.page.getByTestId('product-brand-badge');
+    await badges.first().waitFor({ state: 'visible' });
+    
+    const count = await badges.count();
     for (let i = 0; i < count; i++) {
-      await expect(this.productCards.nth(i).getByTestId('product-brand-badge')).toContainText(brand);
+      await expect(badges.nth(i)).toContainText(brand);
     }
   }
 
   async expectAllCardsHaveType(type: string) {
-    const count = await this.productCards.count();
+    // Get all type badges (which are within product cards)
+    const badges = this.page.getByTestId('product-type-badge');
+    await badges.first().waitFor({ state: 'visible' });
+    
+    const count = await badges.count();
     for (let i = 0; i < count; i++) {
-      await expect(this.productCards.nth(i).getByTestId('product-type-badge')).toContainText(type);
+      await expect(badges.nth(i)).toContainText(type);
     }
   }
 
   async sortBy(value: string) {
     await this.sortDropdown.selectOption(value);
+    await expect(this.sortDropdown).toHaveValue(value);
+    // Wait for product cards to update after sort
+    await this.productCards.first().waitFor({ state: 'visible' });
+    await this.page.waitForLoadState('networkidle');
+
+    if (value === 'priceAsc' || value === 'priceDesc') {
+      await this.page.waitForFunction(
+        (sortValue) => {
+          const priceElements = Array.from(document.querySelectorAll('[data-testid="product-price"]'));
+          const prices = priceElements
+            .map((el) => {
+              const text = (el.textContent || '').replace(/[^0-9.]/g, '');
+              return Number.parseFloat(text);
+            })
+            .filter((price) => Number.isFinite(price));
+
+          if (prices.length < 2) return false;
+
+          for (let i = 1; i < prices.length; i++) {
+            if (sortValue === 'priceAsc' && prices[i] < prices[i - 1]) return false;
+            if (sortValue === 'priceDesc' && prices[i] > prices[i - 1]) return false;
+          }
+
+          return true;
+        },
+        value
+      );
+    }
   }
 
   async goToPage(pageNumber: number) {
@@ -120,12 +174,16 @@ export class ProductListPage extends BasePage {
   }
 
   async getProductNames(): Promise<string[]> {
-    return this.productCards.locator('.card-title').allTextContents();
+    const names = await this.productNames.allTextContents();
+    return names.map((name) => name.trim()).filter(Boolean);
   }
 
   async getProductPrices(): Promise<number[]> {
-    const texts = await this.productCards.locator('.text-success').allTextContents();
-    return texts.map((t) => parseFloat(t.replace(/[^0-9.]/g, '')));
+    await this.productPrices.first().waitFor({ state: 'visible' });
+    const texts = await this.productPrices.allTextContents();
+    return texts
+      .map((t) => parseFloat(t.replace(/[^0-9.]/g, '')))
+      .filter((price) => Number.isFinite(price));
   }
 
   async getProductCount(): Promise<number> {
@@ -134,6 +192,14 @@ export class ProductListPage extends BasePage {
 
   async clickProduct(index: number) {
     await this.productCards.nth(index).click();
+  }
+
+  createdProductCard(name: string, description: string): Locator {
+    return this.page
+      .getByTestId('product-card')
+      .filter({ hasText: name })
+      .filter({ hasText: description })
+      .first();
   }
 
   paginationPageButton(page: number): Locator {

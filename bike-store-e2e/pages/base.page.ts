@@ -4,6 +4,8 @@ export class BasePage {
   readonly navbar: Locator;
   readonly brandLink: Locator;
   readonly homeLink: Locator;
+  readonly cartNavLink: Locator;
+  readonly cartCountBadge: Locator;
   readonly loginButton: Locator;
   readonly registerButton: Locator;
   readonly logoutButton: Locator;
@@ -13,6 +15,8 @@ export class BasePage {
     this.navbar = page.getByTestId('main-navbar');
     this.brandLink = this.navbar.getByRole('link', { name: /bike store/i });
     this.homeLink = this.navbar.getByRole('link', { name: /home/i });
+    this.cartNavLink = page.getByTestId('cart-nav-link');
+    this.cartCountBadge = page.getByTestId('cart-count-badge');
     this.loginButton = this.navbar.getByRole('button', { name: /login/i });
     this.registerButton = this.navbar.getByRole('button', { name: /register/i });
     this.logoutButton = this.navbar.getByRole('button', { name: /logout/i });
