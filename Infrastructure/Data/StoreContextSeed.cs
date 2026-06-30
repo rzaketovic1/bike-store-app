@@ -1,16 +1,17 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Core.Entities;
 
 namespace Infrastructure.Data;
 
 public class StoreContextSeed
 {
-    public static async Task SeedAsync(StoreContext context)
+    public static async Task SeedAsync(StoreContext context, string contentRootPath)
     {
+        var seedFilePath = GetSeedFilePath(contentRootPath);
+
         if (!context.Products.Any())
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "products.json");
-            var productsData = await File.ReadAllTextAsync(path);
+            var productsData = await File.ReadAllTextAsync(seedFilePath);
             var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
             if (products == null) return;
@@ -21,8 +22,7 @@ public class StoreContextSeed
         else
         {
             // UPDATE: Refresh PictureUrls ako su već u bazi
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "products.json");
-            var productsData = await File.ReadAllTextAsync(path);
+            var productsData = await File.ReadAllTextAsync(seedFilePath);
             var updatedProducts = JsonSerializer.Deserialize<List<Product>>(productsData);
 
             if (updatedProducts == null) return;
@@ -38,5 +38,10 @@ public class StoreContextSeed
 
             await context.SaveChangesAsync();
         }
+    }
+
+    private static string GetSeedFilePath(string contentRootPath)
+    {
+        return Path.Combine(contentRootPath, "Infrastructure", "Data", "SeedData", "products.json");
     }
 }

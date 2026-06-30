@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Sensitive configuration files
+appsettings.Supabase.json
+
 # User-specific files
 *.rsuser
 *.suo

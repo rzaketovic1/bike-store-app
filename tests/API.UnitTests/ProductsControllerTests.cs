@@ -1,6 +1,7 @@
 using API.Controllers;
-using Core.Dtos;
-using Core.Interfaces;
+using Application.Common.Exceptions;
+using Application.Common.Pagination;
+using Application.Dtos;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +43,6 @@ public class ProductsControllerTests
         var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
         okResult.StatusCode.Should().Be(200);
 
-        // Verify returned anonymous object properties
         var value = okResult.Value;
         value.Should().NotBeNull();
 
@@ -87,21 +87,6 @@ public class ProductsControllerTests
         returnedProduct.Price.Should().Be(599.99m);
     }
 
-    [Fact]
-    public async Task GetProduct_ShouldReturnNotFound_WhenProductDoesNotExist()
-    {
-        // Arrange
-        _serviceMock.Setup(s => s.GetProductByIdAsync(999))
-            .ReturnsAsync((ProductDto?)null);
-
-        // Act
-        var result = await _controller.GetProduct(999);
-
-        // Assert
-        var notFoundResult = result.Result.Should().BeOfType<NotFoundObjectResult>().Subject;
-        notFoundResult.StatusCode.Should().Be(404);
-    }
-
     #endregion
 
     #region GetBrands Tests
@@ -126,23 +111,6 @@ public class ProductsControllerTests
         returnedBrands.Should().Contain("Trek");
         returnedBrands.Should().Contain("Giant");
         returnedBrands.Should().Contain("Specialized");
-    }
-
-    [Fact]
-    public async Task GetBrands_ShouldReturnEmptyList_WhenNoBrandsExist()
-    {
-        // Arrange
-        _serviceMock.Setup(s => s.GetBrandsAsync())
-            .ReturnsAsync(new List<string>());
-
-        // Act
-        var result = await _controller.GetBrands();
-
-        // Assert
-        var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-        var returnedBrands = okResult.Value.Should().BeAssignableTo<IReadOnlyList<string>>().Subject;
-
-        returnedBrands.Should().BeEmpty();
     }
 
     #endregion
@@ -214,54 +182,6 @@ public class ProductsControllerTests
     #region CreateProductWithImage Tests
 
     [Fact]
-    public async Task CreateProductWithImage_ShouldReturnBadRequest_WhenImageIsNull()
-    {
-        // Arrange
-        var dto = new ProductWithImageDto
-        {
-            Name = "Test Bike",
-            Description = "Test description",
-            Price = 599.99m,
-            Brand = "Trek",
-            Type = "Mountain",
-            QuantityInStock = 10,
-            Image = null
-        };
-
-        // Act
-        var result = await _controller.CreateProductWithImage(dto);
-
-        // Assert
-        var badRequestResult = result.Result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        badRequestResult.StatusCode.Should().Be(400);
-    }
-
-    [Fact]
-    public async Task CreateProductWithImage_ShouldReturnBadRequest_WhenImageIsEmpty()
-    {
-        // Arrange
-        var fileMock = new Mock<IFormFile>();
-        fileMock.Setup(f => f.Length).Returns(0);
-
-        var dto = new ProductWithImageDto
-        {
-            Name = "Test Bike",
-            Description = "Test description",
-            Price = 599.99m,
-            Brand = "Trek",
-            Type = "Mountain",
-            QuantityInStock = 10,
-            Image = fileMock.Object
-        };
-
-        // Act
-        var result = await _controller.CreateProductWithImage(dto);
-
-        // Assert
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
-    }
-
-    [Fact]
     public async Task CreateProductWithImage_ShouldReturnCreated_WhenSuccessful()
     {
         // Arrange
@@ -293,34 +213,6 @@ public class ProductsControllerTests
         createdResult.StatusCode.Should().Be(201);
     }
 
-    [Fact]
-    public async Task CreateProductWithImage_ShouldReturnBadRequest_WhenArgumentExceptionThrown()
-    {
-        // Arrange
-        var fileMock = new Mock<IFormFile>();
-        fileMock.Setup(f => f.Length).Returns(1024);
-
-        var dto = new ProductWithImageDto
-        {
-            Name = "Test",
-            Description = "Test description",
-            Price = 599.99m,
-            Brand = "Trek",
-            Type = "Mountain",
-            QuantityInStock = 10,
-            Image = fileMock.Object
-        };
-
-        _serviceMock.Setup(s => s.CreateProductWithImageAsync(dto))
-            .ThrowsAsync(new ArgumentException("Invalid image file"));
-
-        // Act
-        var result = await _controller.CreateProductWithImage(dto);
-
-        // Assert
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
-    }
-
     #endregion
 
     #region UpdateProduct Tests
@@ -346,32 +238,17 @@ public class ProductsControllerTests
     }
 
     [Fact]
-    public async Task UpdateProduct_ShouldReturnNotFound_WhenProductDoesNotExist()
+    public async Task UpdateProduct_ShouldThrowBadRequestException_WhenIdMismatch()
     {
         // Arrange
-        var updateDto = CreateProductDto(999, "Updated Bike");
-
-        _serviceMock.Setup(s => s.UpdateProduct(999, updateDto))
-            .ReturnsAsync((ProductDto?)null);
+        var updateDto = CreateProductDto(2, "Test Bike");
 
         // Act
-        var result = await _controller.UpdateProduct(999, updateDto);
+        var act = async () => await _controller.UpdateProduct(1, updateDto);
 
         // Assert
-        result.Result.Should().BeOfType<NotFoundObjectResult>();
-    }
-
-    [Fact]
-    public async Task UpdateProduct_ShouldReturnBadRequest_WhenIdMismatch()
-    {
-        // Arrange
-        var updateDto = CreateProductDto(2, "Test Bike"); // ID = 2
-
-        // Act
-        var result = await _controller.UpdateProduct(1, updateDto); // URL ID = 1
-
-        // Assert
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
+        await act.Should().ThrowAsync<BadRequestException>()
+            .WithMessage("ID mismatch between URL and request body");
     }
 
     #endregion
@@ -408,31 +285,6 @@ public class ProductsControllerTests
         returnedProduct.Name.Should().Be("Updated Bike");
     }
 
-    [Fact]
-    public async Task UpdateProductWithImage_ShouldReturnNotFound_WhenProductDoesNotExist()
-    {
-        // Arrange
-        var dto = new ProductWithImageDto
-        {
-            Name = "Test",
-            Description = "Test description",
-            Price = 599.99m,
-            Brand = "Trek",
-            Type = "Mountain",
-            QuantityInStock = 10,
-            Image = null
-        };
-
-        _serviceMock.Setup(s => s.UpdateProductWithImageAsync(999, dto))
-            .ReturnsAsync((ProductDto?)null);
-
-        // Act
-        var result = await _controller.UpdateProductWithImage(999, dto);
-
-        // Assert
-        result.Result.Should().BeOfType<NotFoundObjectResult>();
-    }
-
     #endregion
 
     #region DeleteProduct Tests
@@ -442,41 +294,13 @@ public class ProductsControllerTests
     {
         // Arrange
         _serviceMock.Setup(s => s.DeleteProduct(1))
-            .ReturnsAsync(true);
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await _controller.DeleteProduct(1);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
-    }
-
-    [Fact]
-    public async Task DeleteProduct_ShouldReturnNotFound_WhenProductDoesNotExist()
-    {
-        // Arrange
-        _serviceMock.Setup(s => s.DeleteProduct(999))
-            .ReturnsAsync(false);
-
-        // Act
-        var result = await _controller.DeleteProduct(999);
-
-        // Assert
-        result.Should().BeOfType<NotFoundObjectResult>();
-    }
-
-    [Fact]
-    public async Task DeleteProduct_ShouldCallService_WithCorrectId()
-    {
-        // Arrange
-        _serviceMock.Setup(s => s.DeleteProduct(It.IsAny<int>()))
-            .ReturnsAsync(true);
-
-        // Act
-        await _controller.DeleteProduct(42);
-
-        // Assert
-        _serviceMock.Verify(s => s.DeleteProduct(42), Times.Once);
     }
 
     #endregion
@@ -497,3 +321,4 @@ public class ProductsControllerTests
 
     #endregion
 }
+

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Application.Common.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Middleware
 {
@@ -25,19 +26,20 @@ namespace API.Middleware
 
         private static Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
-            // Decide the status dynamically based on the type of exception
-            int statusCode = ex switch
+            var statusCode = ex switch
             {
-                KeyNotFoundException => StatusCodes.Status409Conflict,
-                ArgumentException => StatusCodes.Status400BadRequest,
+                NotFoundException => StatusCodes.Status404NotFound,
+                ConflictException => StatusCodes.Status409Conflict,
+                BadRequestException => StatusCodes.Status400BadRequest,
                 UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-                _ => StatusCodes.Status500InternalServerError // fallback
+                _ => StatusCodes.Status500InternalServerError
             };
 
-            string title = statusCode switch
+            var title = statusCode switch
             {
                 StatusCodes.Status400BadRequest => "Bad Request",
                 StatusCodes.Status401Unauthorized => "Unauthorized",
+                StatusCodes.Status404NotFound => "Not Found",
                 StatusCodes.Status409Conflict => "Conflict",
                 StatusCodes.Status500InternalServerError => "Internal Server Error",
                 _ => "Error"
@@ -52,10 +54,9 @@ namespace API.Middleware
                 Instance = context.Request.Path
             };
 
-            context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = statusCode;
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return context.Response.WriteAsJsonAsync(problem, options: null, contentType: "application/problem+json");
         }
     }
 }

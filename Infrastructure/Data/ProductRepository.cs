@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+using Core.Common;
+using Core.Entities;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +40,6 @@ public class ProductRepository(StoreContext context) : IProductRepository
         if (!string.IsNullOrWhiteSpace(type))
             query = query.Where(x => x.Type == type);
 
-
         query = sort switch
         {
             "priceAsc" => query.OrderBy(x => x.Price),
@@ -50,32 +50,36 @@ public class ProductRepository(StoreContext context) : IProductRepository
         return await query.ToListAsync();
     }
 
-    public async Task<PaginatedList<Product>> GetProductsAsync(
-    string? brand, string? type, string? sort, int pageIndex, int pageSize)
-{
-    var query = context.Products.AsQueryable();
-
-    if (!string.IsNullOrWhiteSpace(brand))
-        query = query.Where(x => x.Brand == brand);
-
-    if (!string.IsNullOrWhiteSpace(type))
-        query = query.Where(x => x.Type == type);
-
-    query = sort switch
+    public async Task<PagedResult<Product>> GetProductsAsync(
+        string? brand, string? type, string? sort, int pageIndex, int pageSize)
     {
-        "priceAsc" => query.OrderBy(x => x.Price),
-        "priceDesc" => query.OrderByDescending(x => x.Price),
-        _ => query.OrderBy(x => x.Name)
-    };
+        var query = context.Products.AsQueryable();
 
-    var totalCount = await query.CountAsync(); // Get total record count
-    var items = await query
-            .Skip((pageIndex - 1) * pageSize) // Skip previous pages
-            .Take(pageSize) // Take only current page items
-            .ToListAsync(); // Fetch items as a list
+        if (!string.IsNullOrWhiteSpace(brand))
+            query = query.Where(x => x.Brand == brand);
 
-    return new PaginatedList<Product>(items, totalCount, pageIndex, pageSize);
-}
+        if (!string.IsNullOrWhiteSpace(type))
+            query = query.Where(x => x.Type == type);
+
+        query = sort switch
+        {
+            "priceAsc" => query.OrderBy(x => x.Price),
+            "priceDesc" => query.OrderByDescending(x => x.Price),
+            _ => query.OrderBy(x => x.Name)
+        };
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<Product>
+        {
+            Items = items,
+            TotalCount = totalCount
+        };
+    }
 
     public async Task<IReadOnlyList<string>> GetTypesAsync()
     {

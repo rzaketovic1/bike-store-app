@@ -1,0 +1,182 @@
+[
+  {
+    "Name": "Trek Marlin 7",
+    "Description": "Excellent hardtail mountain bike for recreational riders and beginners.",
+    "Price": 1150.00,
+    "PictureUrl": "trek-marlin7.jpg",
+    "Type": "Mountain",
+    "Brand": "Trek",
+    "QuantityInStock": 7
+  },
+  {
+    "Name": "Giant Talon 1",
+    "Description": "Reliable and versatile bike for mountain trails and city rides.",
+    "Price": 980.00,
+    "PictureUrl": "giant-talon1.jpg",
+    "Type": "Mountain",
+    "Brand": "Giant",
+    "QuantityInStock": 10
+  },
+  {
+    "Name": "Specialized Rockhopper",
+    "Description": "A legendary bike for those who want more adventure.",
+    "Price": 1300.00,
+    "PictureUrl": "specialized-rockhopper.jpg",
+    "Type": "Mountain",
+    "Brand": "Specialized",
+    "QuantityInStock": 5
+  },
+  {
+    "Name": "Scott Scale 970",
+    "Description": "Lightweight and fast mountain bike for advanced riders.",
+    "Price": 1500.00,
+    "PictureUrl": "scott-scale970.jpg",
+    "Type": "Mountain",
+    "Brand": "Scott",
+    "QuantityInStock": 6
+  },
+  {
+    "Name": "Cannondale Trail 5",
+    "Description": "A popular model for mountain biking and everyday use.",
+    "Price": 1200.00,
+    "PictureUrl": "cannondale-trail5.jpg",
+    "Type": "Mountain",
+    "Brand": "Cannondale",
+    "QuantityInStock": 8
+  },
+  {
+    "Name": "Cube Aim Pro",
+    "Description": "Reliable bike with a great price-performance ratio.",
+    "Price": 920.00,
+    "PictureUrl": "cube-aimpro.jpg",
+    "Type": "Mountain",
+    "Brand": "Cube",
+    "QuantityInStock": 12
+  },
+  {
+    "Name": "Merida Big Nine 300",
+    "Description": "Robust mountain bike for all terrains.",
+    "Price": 1100.00,
+    "PictureUrl": "merida-big-nine-300.jpg",
+    "Type": "Mountain",
+    "Brand": "Merida",
+    "QuantityInStock": 9
+  },
+  {
+    "Name": "Bianchi C-Sport 2.5",
+    "Description": "High-quality city bike with sporty characteristics.",
+    "Price": 899.00,
+    "PictureUrl": "bianchi-csport2.5.jpg",
+    "Type": "City",
+    "Brand": "Bianchi",
+    "QuantityInStock": 13
+  },
+  {
+    "Name": "Giant Escape 3",
+    "Description": "Perfect choice for daily commuting and fitness rides.",
+    "Price": 650.00,
+    "PictureUrl": "giant-escape3.jpg",
+    "Type": "City",
+    "Brand": "Giant",
+    "QuantityInStock": 15
+  },
+  {
+    "Name": "Trek FX 2 Disc",
+    "Description": "Versatile fitness bike for city and light rides.",
+    "Price": 850.00,
+    "PictureUrl": "trek-fx2disc.jpg",
+    "Type": "City",
+    "Brand": "Trek",
+    "QuantityInStock": 10
+  },
+  {
+    "Name": "Cube Touring",
+    "Description": "Reliable touring bike for longer journeys.",
+    "Price": 1100.00,
+    "PictureUrl": "cube-touring.jpg",
+    "Type": "Trekking",
+    "Brand": "Cube",
+    "QuantityInStock": 4
+  },
+  {
+    "Name": "Specialized Sirrus 2.0",
+    "Description": "Ideal bike for recreational riders and beginners.",
+    "Price": 700.00,
+    "PictureUrl": "specialized-sirrus2.0.jpg",
+    "Type": "City",
+    "Brand": "Specialized",
+    "QuantityInStock": 8
+  },
+  {
+    "Name": "Giant FastRoad SL 2",
+    "Description": "Fast fitness bike with an aluminum frame.",
+    "Price": 1200.00,
+    "PictureUrl": "giant-fastroadsl2.jpg",
+    "Type": "Road",
+    "Brand": "Giant",
+    "QuantityInStock": 6
+  },
+  {
+    "Name": "Scott Sub Cross 50",
+    "Description": "Universal bike for both asphalt and gravel roads.",
+    "Price": 800.00,
+    "PictureUrl": "scott-subcross50.jpg",
+    "Type": "Trekking",
+    "Brand": "Scott",
+    "QuantityInStock": 7
+  },
+  {
+    "Name": "Bianchi Via Nirone 7",
+    "Description": "Classic road bike from the famous Italian brand.",
+    "Price": 1500.00,
+    "PictureUrl": "bianchi-vianirone7.jpg",
+    "Type": "Road",
+    "Brand": "Bianchi",
+    "QuantityInStock": 5
+  },
+  {
+    "Name": "Cannondale Quick 4",
+    "Description": "Lightweight bike for city streets and fitness rides.",
+    "Price": 950.00,
+    "PictureUrl": "cannondale-quick4.jpg",
+    "Type": "City",
+    "Brand": "Cannondale",
+    "QuantityInStock": 8
+  },
+  {
+    "Name": "Merida Scultura 100",
+    "Description": "Entry-level road bike with style.",
+    "Price": 1250.00,
+    "PictureUrl": "merida-scultura100.jpg",
+    "Type": "Road",
+    "Brand": "Merida",
+    "QuantityInStock": 5
+  },
+  {
+    "Name": "Scott Speedster 50",
+    "Description": "Road bike ideal for training and fast riding.",
+    "Price": 1050.00,
+    "PictureUrl": "scott-speedster50.jpg",
+    "Type": "Road",
+    "Brand": "Scott",
+    "QuantityInStock": 7
+  },
+  {
+    "Name": "Cube Attain Race",
+    "Description": "Aluminum frame, comfort and speed for all conditions.",
+    "Price": 1350.00,
+    "PictureUrl": "cube-attainrace.jpg",
+    "Type": "Road",
+    "Brand": "Cube",
+    "QuantityInStock": 6
+  },
+  {
+    "Name": "Trek Domane AL 2",
+    "Description": "Road bike for beginners and recreational riders.",
+    "Price": 1150.00,
+    "PictureUrl": "trek-domaneal2.jpg",
+    "Type": "Road",
+    "Brand": "Trek",
+    "QuantityInStock": 9
+  }
+]

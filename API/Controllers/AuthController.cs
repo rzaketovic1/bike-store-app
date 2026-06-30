@@ -1,5 +1,5 @@
-﻿using Core.Dtos;
-using Core.Interfaces;
+using Application.Dtos;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -22,24 +22,15 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<UserDto>> Register(UserRegisterDto registerDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var existingUser = await userService.GetByEmailAsync(registerDto.Email);
-            if (existingUser != null)
-                return Conflict(new { message = "Email already in use" });
-
             var user = await userService.CreateAsync(registerDto.Email, registerDto.Password, registerDto.DisplayName);
             var token = tokenService.CreateToken(user);
 
-            var userDto = new UserDto
+            return StatusCode(StatusCodes.Status201Created, new UserDto
             {
                 Email = user.Email,
                 DisplayName = user.DisplayName,
                 Token = token
-            };
-
-            return StatusCode(StatusCodes.Status201Created, userDto);
+            });
         }
 
         /// <summary>
@@ -55,13 +46,7 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<UserDto>> Login(UserLoginDto loginDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var user = await userService.AuthenticateAsync(loginDto.Email, loginDto.Password);
-            if (user == null)
-                return Unauthorized(new { message = "Invalid credentials" });
-
             var token = tokenService.CreateToken(user);
 
             return Ok(new UserDto

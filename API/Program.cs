@@ -1,7 +1,7 @@
-﻿using API.Middleware;
-using Core.Interfaces;
+using API.Middleware;
+using Application;
+using Infrastructure;
 using Infrastructure.Data;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,16 +21,8 @@ builder.Logging.AddConsole();
 
 // ----- Services -----
 builder.Services.AddControllers();
-
-builder.Services.AddDbContext<StoreContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 
 
@@ -127,7 +119,7 @@ try
     var logger = services.GetRequiredService<ILogger<Program>>();
 
     await context.Database.MigrateAsync();
-    await StoreContextSeed.SeedAsync(context);
+    await StoreContextSeed.SeedAsync(context, app.Environment.ContentRootPath);
 }
 catch (Exception ex)
 {
