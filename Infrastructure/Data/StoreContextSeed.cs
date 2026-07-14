@@ -42,6 +42,7 @@ public class StoreContextSeed
 
     private static string GetSeedFilePath(string contentRootPath)
     {
-        return Path.Combine(contentRootPath, "Infrastructure", "Data", "SeedData", "products.json");
+        var solutionRoot = Directory.GetParent(contentRootPath)?.FullName ?? contentRootPath;
+        return Path.Combine(solutionRoot, "Infrastructure", "Data", "SeedData", "products.json");
     }
 }
