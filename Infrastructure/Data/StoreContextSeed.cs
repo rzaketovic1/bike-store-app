@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Core.Entities;
+using System.Text.Json;
 
 namespace Infrastructure.Data;
 
@@ -42,7 +43,28 @@ public class StoreContextSeed
 
     private static string GetSeedFilePath(string contentRootPath)
     {
-        var solutionRoot = Directory.GetParent(contentRootPath)?.FullName ?? contentRootPath;
-        return Path.Combine(solutionRoot, "Infrastructure", "Data", "SeedData", "products.json");
+        // Try multiple possible paths for different environments
+        var possiblePaths = new[]
+        {
+            // Docker/Production deployment (published files with TargetPath)
+            Path.Combine(contentRootPath, "Infrastructure", "Data", "SeedData", "products.json"),
+            // Alternative published path
+            Path.Combine(contentRootPath, "Data", "SeedData", "products.json"),
+            // Development (solution structure)
+            Path.Combine(Directory.GetParent(contentRootPath)?.FullName ?? contentRootPath, "Infrastructure", "Data", "SeedData", "products.json"),
+            // Local project path
+            Path.Combine(contentRootPath, "..", "Infrastructure", "Data", "SeedData", "products.json")
+        };
+
+        foreach (var path in possiblePaths)
+        {
+            var normalizedPath = Path.GetFullPath(path);
+            if (File.Exists(normalizedPath))
+            {
+                return normalizedPath;
+            }
+        }
+
+        throw new FileNotFoundException($"Could not find products.json in content root: {contentRootPath}. Searched: {string.Join(", ", possiblePaths)}");
     }
 }

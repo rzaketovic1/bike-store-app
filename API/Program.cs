@@ -118,12 +118,18 @@ try
     var context = services.GetRequiredService<StoreContext>();
     var logger = services.GetRequiredService<ILogger<Program>>();
 
+    logger.LogInformation("Starting database migration...");
     await context.Database.MigrateAsync();
+
+    logger.LogInformation("Migration completed. Starting seeding from: {ContentRoot}", app.Environment.ContentRootPath);
     await StoreContextSeed.SeedAsync(context, app.Environment.ContentRootPath);
+
+    logger.LogInformation("Database seeding completed successfully.");
 }
 catch (Exception ex)
 {
-    Console.WriteLine("Migration/Seeding failed: " + ex.Message);
+    Console.WriteLine($"Migration/Seeding failed: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
     throw;
 }
 
