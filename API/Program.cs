@@ -157,6 +157,9 @@ app.UseSwaggerUI();
 
 app.MapControllers();
 
+// Health check endpoint for Render
+app.MapGet("/", () => Results.Ok(new { status = "healthy", service = "BikeStore API", version = "1.0" }));
+
 await app.RunAsync();
 
 public partial class Program { }
