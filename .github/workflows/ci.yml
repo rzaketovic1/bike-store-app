@@ -46,8 +46,11 @@ jobs:
       - name: Run API unit tests
         run: dotnet test tests/API.UnitTests/API.UnitTests.csproj --configuration Release --logger "trx;LogFileName=api-unit-tests.trx"
 
-      - name: Run Core unit tests
-        run: dotnet test tests/Core.UnitTests/Core.UnitTests.csproj --configuration Release --logger "trx;LogFileName=core-unit-tests.trx"
+      - name: Run Application unit tests
+        run: dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --configuration Release --logger "trx;LogFileName=application-unit-tests.trx"
+
+      - name: Run Infrastructure unit tests
+        run: dotnet test tests/Infrastructure.UnitTests/Infrastructure.UnitTests.csproj --configuration Release --logger "trx;LogFileName=infrastructure-unit-tests.trx"
 
       # 6) Publish test results in GitHub Actions summary/checks
       - name: Publish backend test results
