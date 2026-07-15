@@ -13,6 +13,10 @@ jobs:
   build-test:
     name: Backend tests + Frontend build
     runs-on: ubuntu-latest
+    permissions:
+     contents: read
+     checks: write
+     pull-requests: write
 
     steps:
       # 1) Checkout repository
