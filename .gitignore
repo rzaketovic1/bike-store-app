@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Sensitive configuration files
+appsettings.Supabase.json
+
 # User-specific files
 *.rsuser
 *.suo
@@ -489,3 +492,6 @@ client/node_modules/
 client/dist/
 client/.angular/
 client/.env
+
+# Playwright MCP snapshots
+page-*.yml

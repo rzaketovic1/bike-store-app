@@ -1,16 +1,17 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Core.Entities;
 
 namespace Infrastructure.Data;
 
 public class StoreContextSeed
 {
-    public static async Task SeedAsync(StoreContext context)
+    public static async Task SeedAsync(StoreContext context, string contentRootPath)
     {
+        var seedFilePath = GetSeedFilePath(contentRootPath);
+
         if (!context.Products.Any())
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "products.json");
-            var productsData = await File.ReadAllTextAsync(path);
+            var productsData = await File.ReadAllTextAsync(seedFilePath);
             var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
             if (products == null) return;
@@ -21,8 +22,7 @@ public class StoreContextSeed
         else
         {
             // UPDATE: Refresh PictureUrls ako su već u bazi
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "products.json");
-            var productsData = await File.ReadAllTextAsync(path);
+            var productsData = await File.ReadAllTextAsync(seedFilePath);
             var updatedProducts = JsonSerializer.Deserialize<List<Product>>(productsData);
 
             if (updatedProducts == null) return;
@@ -38,5 +38,32 @@ public class StoreContextSeed
 
             await context.SaveChangesAsync();
         }
+    }
+
+    private static string GetSeedFilePath(string contentRootPath)
+    {
+        // Try multiple possible paths for different environments
+        var possiblePaths = new[]
+        {
+            // Docker/Production deployment (published files with TargetPath)
+            Path.Combine(contentRootPath, "Infrastructure", "Data", "SeedData", "products.json"),
+            // Alternative published path
+            Path.Combine(contentRootPath, "Data", "SeedData", "products.json"),
+            // Development (solution structure)
+            Path.Combine(Directory.GetParent(contentRootPath)?.FullName ?? contentRootPath, "Infrastructure", "Data", "SeedData", "products.json"),
+            // Local project path
+            Path.Combine(contentRootPath, "..", "Infrastructure", "Data", "SeedData", "products.json")
+        };
+
+        foreach (var path in possiblePaths)
+        {
+            var normalizedPath = Path.GetFullPath(path);
+            if (File.Exists(normalizedPath))
+            {
+                return normalizedPath;
+            }
+        }
+
+        throw new FileNotFoundException($"Could not find products.json in content root: {contentRootPath}. Searched: {string.Join(", ", possiblePaths)}");
     }
 }

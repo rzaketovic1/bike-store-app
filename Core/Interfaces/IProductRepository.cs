@@ -1,11 +1,12 @@
-﻿using Core.Entities;
+using Core.Common;
+using Core.Entities;
 
 namespace Core.Interfaces;
 
 public interface IProductRepository
 {
     Task<IReadOnlyList<Product>> GetProductsAsync(string? brand, string? type, string? sort);
-    Task<PaginatedList<Product>> GetProductsAsync(
+    Task<PagedResult<Product>> GetProductsAsync(
     string? brand, string? type, string? sort, int pageIndex, int pageSize);
     Task<Product?> GetProductByIdAsync(int id);
     Task<IReadOnlyList<string>> GetBrandsAsync();

@@ -1,85 +1,90 @@
-﻿using API.Controllers;
-using Core.Dtos;
+using API.Controllers;
+using Application.Dtos;
 using Core.Entities;
-using Core.Interfaces;
+using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace API.UnitTests
+namespace API.UnitTests;
+
+public class AuthControllerTests
 {
-    public class AuthControllerTests
+    private readonly Mock<IUserService> _userServiceMock = new();
+    private readonly Mock<ITokenService> _tokenServiceMock = new();
+
+    private AuthController CreateController()
+        => new(_userServiceMock.Object, _tokenServiceMock.Object);
+
+    [Fact]
+    public async Task Register_ShouldReturnCreatedUserDto_WhenRegistrationSuccessful()
     {
-        [Fact]
-        public async Task Register_ShouldThrowKeyNotFoundException_WhenEmailAlreadyInUse()
+        var user = new User
         {
-            // Arrange
-            var userService = new Mock<IUserService>();
-            var tokenService = new Mock<ITokenService>();
+            Id = 1,
+            Email = "new@user.com",
+            DisplayName = "New User",
+            PasswordHash = "hash"
+        };
 
-            userService
-                .Setup(s => s.GetByEmailAsync("a@b.com"))
-                .ReturnsAsync(new User { Email = "a@b.com" });
-
-            var controller = new AuthController(userService.Object, tokenService.Object);
-
-            var dto = new UserRegisterDto
-            {
-                Email = "a@b.com",
-                Password = "Pass123!",
-                DisplayName = "Ramiz"
-            };
-
-            // Act & Assert
-            var ex = await Assert.ThrowsAsync<KeyNotFoundException>(() => controller.Register(dto));
-
-            Assert.Equal("Email already in use", ex.Message);
-        }
-
-
-        [Fact]
-        public async Task Register_ShouldReturnUserDtoWithToken_WhenRegistrationSuccessful()
+        var dto = new UserRegisterDto
         {
-            // Arrange
-            var userService = new Mock<IUserService>();
-            var tokenService = new Mock<ITokenService>();
+            Email = user.Email,
+            Password = "Pass123!",
+            DisplayName = user.DisplayName
+        };
 
-            userService
-                .Setup(s => s.GetByEmailAsync("new@user.com"))
-                .ReturnsAsync((User)null!);
+        _userServiceMock
+            .Setup(s => s.CreateAsync(dto.Email, dto.Password, dto.DisplayName))
+            .ReturnsAsync(user);
 
-            var createdUser = new User
-            {
-                Email = "new@user.com",
-                DisplayName = "Ramiz"
-            };
+        _tokenServiceMock
+            .Setup(t => t.CreateToken(user))
+            .Returns("fake-jwt-token");
 
-            userService
-                .Setup(s => s.CreateAsync("new@user.com", "Pass123!", "Ramiz"))
-                .ReturnsAsync(createdUser);
+        var result = await CreateController().Register(dto);
 
-            tokenService
-                .Setup(t => t.CreateToken(createdUser))
-                .Returns("fake-jwt-token");
+        var objectResult = result.Result.Should().BeOfType<ObjectResult>().Subject;
+        objectResult.StatusCode.Should().Be(StatusCodes.Status201Created);
 
-            var controller = new AuthController(userService.Object, tokenService.Object);
+        var response = objectResult.Value.Should().BeOfType<UserDto>().Subject;
+        response.Email.Should().Be(dto.Email);
+        response.DisplayName.Should().Be(dto.DisplayName);
+        response.Token.Should().Be("fake-jwt-token");
+    }
 
-            var dto = new UserRegisterDto
-            {
-                Email = "new@user.com",
-                Password = "Pass123!",
-                DisplayName = "Ramiz"
-            };
+    [Fact]
+    public async Task Login_ShouldReturnUserDto_WhenCredentialsAreValid()
+    {
+        var user = new User
+        {
+            Id = 1,
+            Email = "user@test.com",
+            DisplayName = "Test User",
+            PasswordHash = "hash"
+        };
 
-            // Act
-            var result = await controller.Register(dto);
+        var dto = new UserLoginDto
+        {
+            Email = user.Email,
+            Password = "Pass123!"
+        };
 
-            // Assert
-            var actionResult = Assert.IsType<ActionResult<UserDto>>(result);
-            var userDto = Assert.IsType<UserDto>(actionResult.Value);
+        _userServiceMock
+            .Setup(s => s.AuthenticateAsync(dto.Email, dto.Password))
+            .ReturnsAsync(user);
 
-            Assert.Equal("new@user.com", userDto.Email);
-            Assert.Equal("Ramiz", userDto.DisplayName);
-            Assert.Equal("fake-jwt-token", userDto.Token);
-        }
+        _tokenServiceMock
+            .Setup(t => t.CreateToken(user))
+            .Returns("valid-jwt-token");
+
+        var result = await CreateController().Login(dto);
+
+        var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        var response = okResult.Value.Should().BeOfType<UserDto>().Subject;
+
+        response.Email.Should().Be(dto.Email);
+        response.DisplayName.Should().Be(user.DisplayName);
+        response.Token.Should().Be("valid-jwt-token");
     }
 }

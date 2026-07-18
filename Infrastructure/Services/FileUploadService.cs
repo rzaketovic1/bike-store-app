@@ -1,4 +1,4 @@
-﻿using Core.Interfaces;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -23,11 +23,9 @@ namespace Infrastructure.Services
             if (!IsValidImage(file))
                 throw new ArgumentException("Invalid file type or size");
 
-            // Generate unique filename
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
             var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
 
-            // Create upload directory
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", folder);
             if (!Directory.Exists(uploadsFolder))
             {
@@ -84,14 +82,12 @@ namespace Infrastructure.Services
             if (file == null || file.Length == 0)
                 return false;
 
-            // Check file size
             if (file.Length > MaxFileSize)
             {
                 _logger.LogWarning("File too large: {Size} bytes", file.Length);
                 return false;
             }
 
-            // Check file extension
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!_allowedExtensions.Contains(extension))
             {
@@ -99,7 +95,6 @@ namespace Infrastructure.Services
                 return false;
             }
 
-            // Check content type
             if (!file.ContentType.StartsWith("image/"))
             {
                 _logger.LogWarning("Invalid content type: {ContentType}", file.ContentType);

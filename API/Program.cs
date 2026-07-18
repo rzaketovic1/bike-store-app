@@ -1,7 +1,7 @@
-﻿using API.Middleware;
-using Core.Interfaces;
+using API.Middleware;
+using Application;
+using Infrastructure;
 using Infrastructure.Data;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,16 +21,8 @@ builder.Logging.AddConsole();
 
 // ----- Services -----
 builder.Services.AddControllers();
-
-builder.Services.AddDbContext<StoreContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 
 
@@ -77,7 +69,8 @@ builder.Services.AddCors(opt =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithOrigins(
-                "http://localhost:4200"
+                "http://localhost:4200",
+                "https://bike-store-app-eight.vercel.app"
             );
     });
 });
@@ -125,12 +118,18 @@ try
     var context = services.GetRequiredService<StoreContext>();
     var logger = services.GetRequiredService<ILogger<Program>>();
 
+    logger.LogInformation("Starting database migration...");
     await context.Database.MigrateAsync();
-    await StoreContextSeed.SeedAsync(context);
+
+    logger.LogInformation("Migration completed. Starting seeding from: {ContentRoot}", app.Environment.ContentRootPath);
+    await StoreContextSeed.SeedAsync(context, app.Environment.ContentRootPath);
+
+    logger.LogInformation("Database seeding completed successfully.");
 }
 catch (Exception ex)
 {
-    Console.WriteLine("Migration/Seeding failed: " + ex.Message);
+    Console.WriteLine($"Migration/Seeding failed: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
     throw;
 }
 

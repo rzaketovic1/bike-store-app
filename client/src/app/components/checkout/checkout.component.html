@@ -1,0 +1,172 @@
+<div class="container py-5">
+
+  <h2 class="mb-4 fw-bold" data-testid="checkout-heading">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-credit-card me-2" viewBox="0 0 16 16">
+      <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"/>
+      <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/>
+    </svg>
+    Checkout
+  </h2>
+
+  <div class="row g-4">
+
+    <!-- Left column: Customer information form -->
+    <div class="col-lg-7">
+      <div class="card p-4">
+        <h5 class="mb-4 fw-semibold">Customer Information</h5>
+
+        <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" novalidate data-testid="checkout-form">
+
+          <!-- First Name -->
+          <div class="mb-3">
+            <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+            <input
+              id="firstName"
+              type="text"
+              class="form-control"
+              [class.is-invalid]="isInvalid(firstName)"
+              formControlName="firstName"
+              placeholder="Jane"
+              data-testid="checkout-first-name"
+              autocomplete="given-name"
+            />
+            <div class="invalid-feedback" data-testid="checkout-first-name-error">
+              First name is required.
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+            <input
+              id="lastName"
+              type="text"
+              class="form-control"
+              [class.is-invalid]="isInvalid(lastName)"
+              formControlName="lastName"
+              placeholder="Doe"
+              data-testid="checkout-last-name"
+              autocomplete="family-name"
+            />
+            <div class="invalid-feedback" data-testid="checkout-last-name-error">
+              Last name is required.
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              [class.is-invalid]="isInvalid(email)"
+              formControlName="email"
+              placeholder="jane.doe@example.com"
+              data-testid="checkout-email"
+              autocomplete="email"
+            />
+            <div class="invalid-feedback" data-testid="checkout-email-error">
+              <ng-container *ngIf="email?.errors?.['required']">Email is required.</ng-container>
+              <ng-container *ngIf="email?.errors?.['email']">Please enter a valid email address.</ng-container>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="mb-4">
+            <label for="address" class="form-label">Delivery Address <span class="text-danger">*</span></label>
+            <textarea
+              id="address"
+              class="form-control"
+              [class.is-invalid]="isInvalid(address)"
+              formControlName="address"
+              rows="3"
+              placeholder="123 Main St, City, Country"
+              data-testid="checkout-address"
+              autocomplete="street-address"
+            ></textarea>
+            <div class="invalid-feedback" data-testid="checkout-address-error">
+              Delivery address is required.
+            </div>
+          </div>
+
+          <!-- Form actions -->
+          <div class="d-flex gap-3 flex-wrap">
+            <button
+              type="submit"
+              class="btn btn-success px-4"
+              data-testid="finish-order-btn"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg me-1" viewBox="0 0 16 16">
+                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/>
+              </svg>
+              Finish Order
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary px-4"
+              data-testid="cancel-checkout-btn"
+              (click)="onCancel()"
+            >
+              ← Back to Cart
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Right column: Order summary -->
+    <div class="col-lg-5">
+      <div class="card p-4" data-testid="checkout-order-summary">
+        <h5 class="mb-4 fw-semibold">Order Summary</h5>
+
+        <ng-container *ngIf="cartItems$ | async as cartItems">
+
+          <!-- Item list -->
+          <ul class="list-unstyled mb-4" data-testid="checkout-item-list">
+            <li *ngFor="let item of cartItems" class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom" data-testid="checkout-item-row">
+              <img
+                [src]="getImageUrl(item.product.pictureUrl)"
+                [alt]="item.product.name"
+                style="width: 56px; height: 56px; object-fit: contain;"
+                class="rounded border"
+              />
+              <div class="flex-grow-1">
+                <div class="fw-semibold small" data-testid="checkout-item-name">{{ item.product.name }}</div>
+                <small class="text-muted">Qty: <span data-testid="checkout-item-quantity">{{ item.quantity }}</span></small>
+              </div>
+              <div class="fw-semibold small text-end" data-testid="checkout-item-total">
+                {{ getItemTotal(item) | currency }}
+              </div>
+            </li>
+          </ul>
+
+          <!-- Totals -->
+          <ng-container *ngIf="cartTotal$ | async as subtotal">
+            <div class="d-flex justify-content-between mb-2 text-muted small">
+              <span>Subtotal (<span data-testid="checkout-total-items">{{ cartCount$ | async }}</span> items)</span>
+              <span data-testid="checkout-subtotal">{{ subtotal | currency }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2 text-muted small">
+              <span>Tax (10%)</span>
+              <span data-testid="checkout-tax">{{ getTax(subtotal) | currency }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3 text-muted small">
+              <span>Shipping</span>
+              <span class="text-success fw-semibold" data-testid="checkout-shipping">Free</span>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between fw-bold fs-5">
+              <span>Total</span>
+              <span class="text-success" data-testid="checkout-total">{{ getTotal(subtotal) | currency }}</span>
+            </div>
+          </ng-container>
+
+        </ng-container>
+      </div>
+    </div>
+
+  </div>
+
+</div>

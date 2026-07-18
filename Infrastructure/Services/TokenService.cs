@@ -1,5 +1,5 @@
-﻿using Core.Entities;
-using Core.Interfaces;
+using Application.Interfaces;
+using Core.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,7 +20,7 @@ namespace Infrastructure.Services
         public string CreateToken(User user)
         {
             var claims = new[]
-{
+            {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Name, user.DisplayName),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
