@@ -3,7 +3,7 @@ import { ProductListPage } from '../../pages/product-list.page';
 import { CartPage } from '../../pages/cart.page';
 
 test.describe('Cart', () => {
-  test('user can add a product to cart and verify it appears in cart', async ({ page }) => {
+  test('should add product to cart and display in cart page', async ({ page }) => {
     const productList = new ProductListPage(page);
     await productList.goto();
 
@@ -35,7 +35,7 @@ test.describe('Cart', () => {
     expect(subtotal).toBeGreaterThan(0);
   });
 
-  test('user can remove item from cart and cart becomes empty', async ({ page }) => {
+  test('should remove item from cart and display empty cart', async ({ page }) => {
     const productList = new ProductListPage(page);
     await productList.goto();
 

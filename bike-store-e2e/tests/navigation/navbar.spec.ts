@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { BasePage } from '../../pages/base.page';
 
 test.describe('Navbar - Logged Out', () => {
-  test('brand, home, login and register links verifications', async ({ page }) => {
+  test('should display brand, home, login and register links', async ({ page }) => {
     const basePage = new BasePage(page);
     await page.goto('/');
 
@@ -13,7 +13,7 @@ test.describe('Navbar - Logged Out', () => {
     await expect(basePage.logoutButton).toBeHidden();
   });
 
-  test('navigate to login page', async ({ page }) => {
+  test('should navigate to login page', async ({ page }) => {
     const basePage = new BasePage(page);
     await page.goto('/');
 
@@ -21,7 +21,7 @@ test.describe('Navbar - Logged Out', () => {
     await expect(page).toHaveURL('/login');
   });
 
-  test('navigate to register page', async ({ page }) => {
+  test('should navigate to register page', async ({ page }) => {
     const basePage = new BasePage(page);
     await page.goto('/');
 
@@ -29,7 +29,7 @@ test.describe('Navbar - Logged Out', () => {
     await expect(page).toHaveURL('/register');
   });
 
-  test('navigate home via brand logo', async ({ page }) => {
+  test('should navigate to home via brand logo', async ({ page }) => {
     const basePage = new BasePage(page);
     await page.goto('/login');
 

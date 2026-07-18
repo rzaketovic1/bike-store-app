@@ -36,7 +36,7 @@ import { ToastrModule } from 'ngx-toastr';
     RouterModule.forRoot(routes),
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      positionClass: 'toast-bottom-center',
+      positionClass: 'toast-center-center',
       timeOut: 6000,
       closeButton: true,
       progressBar: true

@@ -261,6 +261,18 @@ html {
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
+#toast-container.toast-center-center {
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+#toast-container.toast-center-center .ngx-toastr {
+  margin: 0 auto 12px auto;
+}
+
 .form-control,
 .form-select {
   border-radius: 8px;

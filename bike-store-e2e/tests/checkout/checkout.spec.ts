@@ -4,7 +4,7 @@ import { CartPage } from '../../pages/cart.page';
 import { CheckoutPage } from '../../pages/checkout.page';
 
 test.describe('Checkout', () => {
-  test('happy path: user completes checkout successfully', async ({ page }) => {
+  test('should complete checkout successfully with valid customer data', async ({ page }) => {
     const productList = new ProductListPage(page);
     const cartPage = new CartPage(page);
     const checkoutPage = new CheckoutPage(page);
