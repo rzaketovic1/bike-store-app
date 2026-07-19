@@ -33,11 +33,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore solution dependencies
-        run: dotnet restore API/API.csproj
+      - name: Restore dependencies
+        run: |
+          dotnet restore API/API.csproj
+          dotnet restore tests/API.UnitTests/API.UnitTests.csproj
+          dotnet restore tests/Application.UnitTests/Application.UnitTests.csproj
+          dotnet restore tests/Infrastructure.UnitTests/Infrastructure.UnitTests.csproj
 
-      - name: Build solution
-        run: dotnet build API/API.csproj --configuration Release --no-restore
+      - name: Build projects
+        run: |
+          dotnet build API/API.csproj --configuration Release --no-restore
+          dotnet build tests/API.UnitTests/API.UnitTests.csproj --configuration Release --no-restore
+          dotnet build tests/Application.UnitTests/Application.UnitTests.csproj --configuration Release --no-restore
+          dotnet build tests/Infrastructure.UnitTests/Infrastructure.UnitTests.csproj --configuration Release --no-restore
 
       - name: Run API unit tests
         continue-on-error: true
