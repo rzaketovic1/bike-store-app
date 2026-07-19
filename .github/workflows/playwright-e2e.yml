@@ -1,0 +1,95 @@
+name: Playwright E2E Tests
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: playwright-e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  playwright-e2e:
+    name: Playwright E2E Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: bikestoredb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: bike-store-e2e/package-lock.json
+
+      - name: Install E2E dependencies
+        working-directory: bike-store-e2e
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: bike-store-e2e
+        run: npx playwright install --with-deps
+
+      - name: Restore backend dependencies
+        run: dotnet restore API/API.csproj
+
+      - name: Build backend
+        run: dotnet build API/API.csproj --configuration Release --no-restore
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Run Playwright E2E tests
+        working-directory: bike-store-e2e
+        env:
+          BASE_URL: http://localhost:4200
+          API_URL: http://localhost:5000/api
+          TEST_USER_EMAIL: e2e-test@bikestore.com
+          TEST_USER_PASSWORD: Test1234!
+          TEST_USER_DISPLAY_NAME: E2E Tester
+          CI: true
+        run: npm test
+
+      - name: Upload Playwright HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: bike-store-e2e/playwright-report/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload Playwright test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: bike-store-e2e/test-results/
+          retention-days: 14
+          if-no-files-found: warn
