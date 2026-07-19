@@ -1,5 +1,4 @@
 name: Unit Tests
-name: Unit Tests
 
 on:
   workflow_dispatch:
@@ -66,78 +65,6 @@ jobs:
           path: TestResults/
           retention-days: 14
           if-no-files-found: warn
-
-      - name: Fail workflow if any tests failed
-        if: ${{ !cancelled() }}
-        run: |
-          if grep -q "outcome=\"Failed\"" TestResults/*.trx 2>/dev/null; then
-            echo "❌ One or more test projects failed"
-            exit 1
-          fi
-  playwright-e2e:
-    name: Playwright E2E Tests
-    runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: bikestoredb
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup .NET 8 SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('API/API.csproj', 'API/**/*.props', 'API/**/*.targets', 'API/packages.lock.json', 'API/global.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      - name: Restore solution dependencies
-        run: dotnet restore API/API.csproj  # Or specify .sln file if exists
-
-      - name: Build solution
-        run: dotnet build API/API.csproj --configuration Release --no-restore
-
-      - name: Run API unit tests
-        run: dotnet test tests/API.UnitTests/API.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=api-unit-tests.trx" --results-directory TestResults
-
-      - name: Run Application unit tests
-        run: dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=application-unit-tests.trx" --results-directory TestResults
-
-      - name: Run Infrastructure unit tests
-        run: dotnet test tests/Infrastructure.UnitTests/Infrastructure.UnitTests.csproj --configuration Release --no-build --logger "trx;LogFileName=infrastructure-unit-tests.trx" --results-directory TestResults
-
-      - name: Publish unit test results
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: TestResults/**/*.trx
-
-      - name: Upload test results artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-results
-          path: TestResults/
-          retention-days: 14
 
       - name: Fail workflow if any tests failed
         if: ${{ !cancelled() }}
